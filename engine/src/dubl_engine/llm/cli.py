@@ -132,7 +132,7 @@ def _from_login_shell(name: str) -> str | None:
         shell = "/bin/zsh" if os.path.exists("/bin/zsh") else "/bin/sh"
     try:
         proc = subprocess.run([shell, "-lic", f"command -v {shlex.quote(name)}"], capture_output=True, text=True,
-                              timeout=LOGIN_SHELL_TIMEOUT_S, stdin=subprocess.DEVNULL, start_new_session=True, check=False,
+                              encoding="utf-8", errors="replace", timeout=LOGIN_SHELL_TIMEOUT_S, stdin=subprocess.DEVNULL, start_new_session=True, check=False,
                               env={**os.environ, "TERM": "dumb"})
     except (OSError, subprocess.TimeoutExpired) as e:
         log.debug("входная оболочка не помогла найти %s: %s", name, type(e).__name__)
@@ -235,7 +235,7 @@ def not_logged_in_text(spec: CliSpec) -> str:
 
 def _run_status(cmd: list[str], env: dict[str, str]) -> tuple[int | None, str]:
     try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=STATUS_TIMEOUT_S, stdin=subprocess.DEVNULL, check=False,
+        proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=STATUS_TIMEOUT_S, stdin=subprocess.DEVNULL, check=False,
                               env=env, cwd=str(_home()) if _home().is_dir() else None)
     except subprocess.TimeoutExpired:
         return None, "timeout"
@@ -366,7 +366,7 @@ def open_login_terminal(kind: ProviderKind) -> str:
         if shutil.which(launcher[0]) is None:
             continue
         try:
-            proc = subprocess.run(launcher, capture_output=True, text=True, timeout=15, stdin=subprocess.DEVNULL, check=False,
+            proc = subprocess.run(launcher, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=15, stdin=subprocess.DEVNULL, check=False,
                                   creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0) if sys.platform == "win32" else 0)
         except (OSError, subprocess.TimeoutExpired) as e:
             last = type(e).__name__

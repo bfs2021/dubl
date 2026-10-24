@@ -56,4 +56,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    for _s in (sys.stdout, sys.stderr):   # Windows: консоль/пайп в cp1252 — русский print иначе падает (UnicodeEncodeError)
+        try:
+            _s.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+        except Exception:  # noqa: BLE001
+            pass
     main()

@@ -179,7 +179,7 @@ def extract(archive: Path, kind: str, wants: list[str], exe_suffix: str, dest: P
 
 
 def probe(exe: Path) -> dict:
-    out = subprocess.run([str(exe), "-hide_banner", "-version"], capture_output=True, text=True, timeout=60)
+    out = subprocess.run([str(exe), "-hide_banner", "-version"], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60)
     if out.returncode != 0:
         raise RuntimeError(f"{exe.name} не запускается: {out.stderr.strip()[:300]}")
     first = out.stdout.splitlines()[0]
@@ -196,7 +196,7 @@ def check_ffmpeg(ffmpeg: Path, ffprobe: Path) -> dict:
     fp = probe(ffprobe)
     if ff["major"] < MIN_MAJOR or fp["major"] < MIN_MAJOR:
         raise RuntimeError(f"нужен ffmpeg >= {MIN_MAJOR}, получено {ff['version']}")
-    enc = subprocess.run([str(ffmpeg), "-hide_banner", "-encoders"], capture_output=True, text=True, timeout=60).stdout
+    enc = subprocess.run([str(ffmpeg), "-hide_banner", "-encoders"], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60).stdout
     missing = [e for e in REQUIRED_ENCODERS if not re.search(rf"\s{re.escape(e)}\s", enc)]
     if missing:
         raise RuntimeError(f"в этой сборке ffmpeg нет кодеков: {', '.join(missing)} (рендер не заработает)")
@@ -260,6 +260,11 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    for _s in (sys.stdout, sys.stderr):   # Windows: консоль/пайп в cp1252 — русский print иначе падает (UnicodeEncodeError)
+        try:
+            _s.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+        except Exception:  # noqa: BLE001
+            pass
     try:
         main()
     except Exception as e:  # noqa: BLE001

@@ -43,10 +43,10 @@ def find_uv() -> str:
 
 
 def host_triple() -> str:
-    out = subprocess.run(["rustc", "--print", "host-tuple"], capture_output=True, text=True, env=CARGO_ENV)
+    out = subprocess.run(["rustc", "--print", "host-tuple"], capture_output=True, text=True, encoding="utf-8", errors="replace", env=CARGO_ENV)
     if out.returncode == 0 and out.stdout.strip():
         return out.stdout.strip()
-    out = subprocess.run(["rustc", "-vV"], capture_output=True, text=True, env=CARGO_ENV)  # старый rustc
+    out = subprocess.run(["rustc", "-vV"], capture_output=True, text=True, encoding="utf-8", errors="replace", env=CARGO_ENV)  # старый rustc
     for line in out.stdout.splitlines():
         if line.startswith("host:"):
             return line.split(":", 1)[1].strip()
@@ -114,4 +114,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    for _s in (sys.stdout, sys.stderr):   # Windows: консоль/пайп в cp1252 — русский print иначе падает (UnicodeEncodeError)
+        try:
+            _s.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+        except Exception:  # noqa: BLE001
+            pass
     main()

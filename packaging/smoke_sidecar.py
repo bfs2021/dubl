@@ -24,9 +24,10 @@ STAGE = HERE / "build" / "stage"
 
 def start(cmd: list[str], env: dict[str, str]):
     t0 = time.time()
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, env=env)
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding="utf-8", errors="replace", env=env)
     assert p.stdout
     for line in p.stdout:
+        print("  |", line.rstrip(), flush=True)          # лог движка виден в CI: если упадёт — понятно где
         m = re.search(r"DUBL_ENGINE_READY port=(\d+)", line)
         if m:
             return p, int(m.group(1)), time.time() - t0
@@ -35,7 +36,7 @@ def start(cmd: list[str], env: dict[str, str]):
 
 def alive(pid: int) -> bool:
     if os.name == "nt":
-        out = subprocess.run(["tasklist", "/FI", f"PID eq {pid}"], capture_output=True, text=True).stdout
+        out = subprocess.run(["tasklist", "/FI", f"PID eq {pid}"], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
         return str(pid) in out
     return subprocess.run(["kill", "-0", str(pid)], capture_output=True).returncode == 0
 
@@ -50,7 +51,8 @@ def main() -> int:
     exe = Path(args[0]).resolve() if args else next((STAGE / "binaries").glob("dubl-engine-*"))
     tmp = Path(tempfile.mkdtemp(prefix="dubl-smoke-"))
     try:
-        app = tmp / "app"
+        # Кириллица и пробел в путях — как у пользователя: программа ставится в «…\\Дубль», данные — в папку с русским именем
+        app = tmp / "Дубль"
         (app / "resources").mkdir(parents=True)
         launcher = app / exe.name
         shutil.copy2(exe, launcher)
@@ -60,7 +62,7 @@ def main() -> int:
             shutil.copytree(STAGE / "resources" / "ffmpeg", app / "resources" / "ffmpeg")
         env = dict(os.environ, DUBL_RESOURCE_DIR=str(app / "resources"))
         env.pop("DUBL_FFMPEG_DIR", None)
-        data = tmp / "data"
+        data = tmp / "Данные Дубль-тест"
 
         times = []
         for i in range(3):
@@ -70,11 +72,15 @@ def main() -> int:
                 health = json.loads(urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=10).read())
                 assert health.get("ok") is True, health
                 print("health:", health)
+                projects = json.loads(urllib.request.urlopen(f"http://127.0.0.1:{port}/projects", timeout=10).read())
+                assert isinstance(projects, list), projects
+                assert data.is_dir() and any(data.iterdir()), f"движок ничего не создал в папке данных {data}"
+                print("папка данных с кириллицей:", data, "→", sorted(x.name for x in data.iterdir()))
             p.terminate()
             p.wait(15)
         print("READY через, с:", ", ".join(f"{x:.2f}" for x in times), "(первый — холодный)")
 
-        chk = json.loads(subprocess.run([str(launcher), "self-check"], capture_output=True, text=True, env=env, check=True).stdout)
+        chk = json.loads(subprocess.run([str(launcher), "self-check"], capture_output=True, text=True, encoding="utf-8", errors="replace", env=env, check=True).stdout)
         print("self-check:", chk)
         assert chk["frozen"] is True
         if has_ff:
@@ -83,10 +89,11 @@ def main() -> int:
         # родитель убит SIGKILL-ом → движок должен завершиться сам (Unix: лаунчер делает exec, PID один)
         if os.name != "nt":
             helper = ("import subprocess,sys;"
-                      "p=subprocess.Popen([sys.argv[1],'--port','0','--data-dir',sys.argv[2]],stdout=subprocess.PIPE,text=True);"
+                      "p=subprocess.Popen([sys.argv[1],'--port','0','--data-dir',sys.argv[2]],stdout=subprocess.PIPE,text=True,encoding='utf-8');"
                       "next(l for l in p.stdout if 'READY' in l);"
                       "print(p.pid,flush=True);import time;time.sleep(120)")
-            parent = subprocess.Popen([sys.executable, "-c", helper, str(launcher), str(data)], stdout=subprocess.PIPE, text=True, env=env)
+            parent = subprocess.Popen([sys.executable, "-c", helper, str(launcher), str(data)], stdout=subprocess.PIPE, text=True,
+                                      encoding="utf-8", errors="replace", env=env)
             assert parent.stdout
             pid = int(parent.stdout.readline())
             assert alive(pid), "движок не запустился"
@@ -107,4 +114,9 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    for _s in (sys.stdout, sys.stderr):   # Windows: консоль/пайп в cp1252 — русский print иначе падает (UnicodeEncodeError)
+        try:
+            _s.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+        except Exception:  # noqa: BLE001
+            pass
     sys.exit(main())

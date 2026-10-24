@@ -37,6 +37,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def run(argv: list[str] | None = None) -> None:
     import uvicorn
 
+    for stream in (sys.stdout, sys.stderr):   # Windows: пайп/консоль в cp1252 — русские сообщения иначе роняют движок
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+        except Exception:  # noqa: BLE001
+            pass
     args = parse_args(argv)
     if args.data_dir:
         os.environ["DUBL_DATA_DIR"] = args.data_dir

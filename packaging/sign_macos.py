@@ -49,7 +49,7 @@ def main() -> int:
     for p in files:
         cmd = ["codesign", "--force", "--options", "runtime", "--timestamp" if args.identity != "-" else "--timestamp=none",
                "--entitlements", args.entitlements, "--sign", args.identity, str(p)]
-        r = subprocess.run(cmd, capture_output=True, text=True)
+        r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
         if r.returncode != 0:
             print(r.stderr, file=sys.stderr)
             sys.exit(f"не удалось подписать {p}")
@@ -61,4 +61,9 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    for _s in (sys.stdout, sys.stderr):   # Windows: консоль/пайп в cp1252 — русский print иначе падает (UnicodeEncodeError)
+        try:
+            _s.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+        except Exception:  # noqa: BLE001
+            pass
     sys.exit(main())
