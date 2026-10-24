@@ -1,0 +1,13 @@
+# В репозитории — только LF. На Windows git по умолчанию (core.autocrlf=true) отдаёт текст с \r\n:
+# справка (docs/ABOUT.md, THIRD-PARTY-NOTICES.md) вшивается в программу как есть, а shell-скрипты с \r\n не запускаются.
+* text=auto eol=lf
+
+*.png binary
+*.ico binary
+*.icns binary
+*.jpg binary
+*.wav binary
+*.mp3 binary
+*.mp4 binary
+*.mkv binary
+*.whl binary
