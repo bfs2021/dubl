@@ -41,8 +41,11 @@ a = Analysis(  # noqa: F821
     noarchive=False,
 )
 pyz = PYZ(a.pure)  # noqa: F821
+# UTF-8 mode (как PYTHONUTF8=1): на Windows open()/read_text() без encoding= и stdio иначе в cp1251/cp1252 —
+# страховка поверх явных encoding="utf-8" в коде (их проверяет engine/tests/test_text_encoding.py).
+options = [("X utf8", None, "OPTION")]
 exe = EXE(  # noqa: F821
-    pyz, a.scripts, [],
+    pyz, a.scripts, options,
     exclude_binaries=True,
     name="dubl-engine",
     console=True,       # нужен stdout: Tauri читает DUBL_ENGINE_READY

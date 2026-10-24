@@ -172,7 +172,8 @@ def main() -> None:
         # диагностика сборки: какой ffmpeg видит движок и что подключено
         from dubl_engine.util import find_binary
         res: dict = {"engine_version": _engine_version(), "frozen": bool(getattr(sys, "frozen", False)),
-                     "ffmpeg_dir_env": os.environ.get("DUBL_FFMPEG_DIR")}
+                     "ffmpeg_dir_env": os.environ.get("DUBL_FFMPEG_DIR"),
+                     "utf8_mode": sys.flags.utf8_mode, "stdout_encoding": getattr(sys.stdout, "encoding", None)}
         for name in ("ffmpeg", "ffprobe"):
             try:
                 res[name] = find_binary(name)

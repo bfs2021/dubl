@@ -74,6 +74,8 @@ def self_check(launcher: Path, env: dict[str, str]) -> dict:
     chk = json.loads(r.stdout)
     print("self-check:", chk)
     assert chk["frozen"] is True
+    assert chk.get("utf8_mode") == 1, "движок собран без UTF-8 mode (dubl-engine.spec → options)"
+    assert str(chk.get("stdout_encoding", "")).lower().replace("-", "") == "utf8", chk
     return chk
 
 
