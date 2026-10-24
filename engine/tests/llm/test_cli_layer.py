@@ -5,6 +5,7 @@ import json
 import os
 import stat
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -58,6 +59,13 @@ def test_find_binary_nvm_versions_newest_first(tmp_path, monkeypatch, real_find)
     monkeypatch.setenv("PATH", "/usr/bin:/bin")
     monkeypatch.setattr(cli, "_from_login_shell", lambda name: None)
     assert cli.find_binary("codex", refresh=True) == new
+
+
+def test_node_version_key_orders_numerically_not_by_listing_order():
+    """Порядок iterdir зависит от ФС (ext4 — хэш, APFS — по алфавиту); сортируем по номеру версии."""
+    names = ["v9.11.2", "v20.11.1", "v18.0.0", "v20.9.0"]
+    got = sorted((Path("/x/.nvm/versions/node") / n for n in names), key=cli._node_version_key, reverse=True)
+    assert [p.name for p in got] == ["v20.11.1", "v20.9.0", "v18.0.0", "v9.11.2"]
 
 
 def test_find_binary_falls_back_to_login_shell_and_caches(tmp_path, monkeypatch, real_find):

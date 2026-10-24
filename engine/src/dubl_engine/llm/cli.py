@@ -82,7 +82,8 @@ def _home() -> Path:
 
 
 def _node_version_key(p: Path) -> tuple:
-    parts = p.parent.parent.name.lstrip("v").split(".")        # …/versions/node/v20.11.1/bin
+    """Ключ сортировки для папки версии nvm (…/versions/node/v20.11.1): (20, 11, 1)."""
+    parts = p.name.lstrip("v").split(".")
     return tuple(int(x) if x.isdigit() else 0 for x in parts)
 
 
@@ -103,7 +104,7 @@ def candidate_dirs() -> list[Path]:
                  Path("/usr/local/bin"), home / ".npm-global" / "bin", home / ".bun" / "bin", home / ".volta" / "bin"]
         nvm = home / ".nvm" / "versions" / "node"
         if nvm.is_dir():
-            dirs += [p / "bin" for p in sorted(nvm.iterdir(), key=lambda p: _node_version_key(p / "bin"), reverse=True)]
+            dirs += [p / "bin" for p in sorted(nvm.iterdir(), key=_node_version_key, reverse=True)]
         if sys.platform != "darwin":
             dirs.append(Path("/usr/bin"))
     out: list[Path] = []
