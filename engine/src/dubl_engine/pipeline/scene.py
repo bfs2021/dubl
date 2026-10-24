@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import shutil
 import tempfile
 from pathlib import Path
@@ -22,7 +23,7 @@ from ..models import (
 from ..settings import AppSettings
 from ..store import ProjectStore
 from ..util import ConflictError, EngineError, ffprobe_json, run_ffmpeg
-from .outputs import release_output, reserve_output
+from .outputs import release_output, reserve_output, windows_safe_name
 from .takes import analyze_take_text, apply_default_star, delete_take_files, empty_reason
 
 log = logging.getLogger(__name__)
@@ -380,6 +381,8 @@ def resolve_output(store: ProjectStore, project, rs: RenderSettings) -> Path:
     out = Path(raw).expanduser()
     if not out.is_absolute():
         out = store.renders_dir(project.id) / out.name
+    if os.name == "nt":
+        out = out.with_name(windows_safe_name(out.name))
     if out.suffix.lower() not in RENDER_SUFFIXES:
         out = out.with_name(out.name + ".mp4")
     if project.source_path and out.resolve() == Path(project.source_path).resolve():

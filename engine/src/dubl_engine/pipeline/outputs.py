@@ -7,9 +7,23 @@ from __future__ import annotations
 
 import contextlib
 import os
+import re
 from pathlib import Path
 
 MAX_COPIES = 999
+_WIN_FORBIDDEN = re.compile(r'[<>:"/\\|?*\x00-\x1f]')
+_WIN_RESERVED = {"CON", "PRN", "AUX", "NUL", *(f"COM{i}" for i in range(1, 10)), *(f"LPT{i}" for i in range(1, 10))}
+
+
+def windows_safe_name(name: str) -> str:
+    """Имя файла, которое примет Windows: без <>:"/\\|?* (двоеточие на NTFS — это «поток» файла: появится пустой
+    «готово», а ролик не сохранится), без точек и пробелов в конце, не CON/NUL/COM1… Остальное (кириллица, кавычка ',
+    скобки, %) оставляем как есть."""
+    stem, dot, ext = name.rpartition(".") if "." in name else (name, "", "")
+    stem = _WIN_FORBIDDEN.sub("_", stem).rstrip(" .") or "_"
+    if stem.split(".")[0].upper() in _WIN_RESERVED:
+        stem = "_" + stem
+    return stem + dot + _WIN_FORBIDDEN.sub("_", ext)
 
 
 def numbered(path: Path, n: int) -> Path:

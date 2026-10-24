@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import json
 import os
-import signal
 import subprocess
 import sys
 import textwrap
@@ -170,7 +169,7 @@ def test_killed_engine_mid_analysis_leaves_no_partial_analysis(tmp_path, simple_
             time.sleep(0.1)
         assert mark.exists(), "разбор не дошёл до распознавания"
     finally:
-        proc.send_signal(signal.SIGKILL)
+        proc.kill()                     # SIGKILL на Unix, TerminateProcess на Windows: движок убит без уборки
         proc.wait(10)
 
     st = ProjectStore(root)

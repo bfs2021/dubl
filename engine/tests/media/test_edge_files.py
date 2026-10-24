@@ -1,6 +1,7 @@
 """Файлы «из жизни»: нечётные размеры, анаморфный SAR, VFR, без звука, пути с кириллицей/пробелами/кавычками."""
 from __future__ import annotations
 
+import os
 import subprocess
 
 import numpy as np
@@ -150,6 +151,8 @@ def test_attached_cover_is_not_main_video(tmp_path):
 
 
 NASTY = ["папка с пробелом", "it's: a [test], 100% ok;x=1", "тест'кавычка\"двойная", "a=b,c:d"]
+if os.name == "nt":     # «:» и «"» Windows в именах не примет; остальное (кавычка ', скобки, %, ;, =, запятая) — оставляем
+    NASTY = [n.replace(":", "_").replace('"', "_") for n in NASTY]
 
 
 @pytest.mark.parametrize("dirname", NASTY)

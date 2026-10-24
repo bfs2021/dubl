@@ -6,7 +6,9 @@
 from __future__ import annotations
 
 import io
+import os
 import time
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -171,6 +173,9 @@ def test_full_cycle(env, rich_mkv, tmp_path):
     assert r.status_code == 200, r.text
     j = _wait(client, r.json()["id"])
     assert j["state"] == "done", j
+    if os.name == "nt":             # «:» Windows в имени не примет — движок заменяет его на «_»
+        assert Path(j["result"]["path"]) == out.with_name("готово_ ролик 'один'.mp4")
+        out = Path(j["result"]["path"])
     assert out.is_file()
     info = ffprobe_json(out, "-show_streams", "-show_format")
     v = next(s for s in info["streams"] if s["codec_type"] == "video")

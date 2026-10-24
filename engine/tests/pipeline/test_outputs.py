@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import time
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -10,7 +11,7 @@ from dubl_engine.api import create_app
 from dubl_engine.jobs import JobManager, NullContext
 from dubl_engine.models import RenderSettings
 from dubl_engine.pipeline.join import render_project
-from dubl_engine.pipeline.outputs import numbered, release_output, reserve_output
+from dubl_engine.pipeline.outputs import numbered, release_output, reserve_output, windows_safe_name
 from dubl_engine.pipeline.scene import render_scene
 
 OLD = "старый ролик".encode()
@@ -102,7 +103,17 @@ def test_render_route_returns_final_path(ready_project, tmp_path):
             assert done["state"] == "done", done
             paths.append(done["result"]["path"])
             assert c.get(done["result"]["url"]).status_code == 200
-        assert paths[0].endswith("/итог.mp4") and paths[1].endswith("/итог (2).mp4")
+        assert [Path(p).name for p in paths] == ["итог.mp4", "итог (2).mp4"]
         job = c.post(f"/projects/{pid}/render", json={"scene_ids": ids, "settings": {**body, "overwrite": True}}).json()
         done = _wait(c, job["id"])
         assert done["state"] == "done" and done["result"]["path"] == paths[0]
+
+
+def test_windows_safe_name():
+    """Двоеточие на NTFS — поток файла: os.open создаёт пустой «готово», а ролик потом не встаёт на место (WinError 87)."""
+    assert windows_safe_name("готово: ролик 'один'.mp4") == "готово_ ролик 'один'.mp4"
+    assert windows_safe_name('a<b>c"d|e?f*g.mp4') == "a_b_c_d_e_f_g.mp4"
+    assert windows_safe_name("ролик. .mp4") == "ролик.mp4"
+    assert windows_safe_name("CON.mp4") == "_CON.mp4" and windows_safe_name("nul.tar.mp4") == "_nul.tar.mp4"
+    assert windows_safe_name("it's [test] 100% ok;x=1, итог.mp4") == "it's [test] 100% ok;x=1, итог.mp4"
+    assert windows_safe_name("без расширения") == "без расширения"

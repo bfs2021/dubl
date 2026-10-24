@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import subprocess
 
 import numpy as np
@@ -59,7 +60,7 @@ def test_write_subtitles(tmp_path):
 
 def test_render_vertical_with_burned_subs_cyrillic_path(simple_mp4, tmp_path):
     wav = write_wav(tmp_path / "mix.wav", 0.1 * np.sin(2 * np.pi * 440 * np.arange(48000 * 10) / 48000).astype(np.float32), 48000)
-    d = tmp_path / "папка с пробелом: тест"
+    d = tmp_path / ("папка с пробелом; тест" if os.name == "nt" else "папка с пробелом: тест")   # «:» в имени Windows не примет
     ass = write_subtitles(_lines(), d / "суб титры.ass", fmt="ass", play_res=(360, 640))
     out = d / "готовое видео.mp4"
     prog = []
