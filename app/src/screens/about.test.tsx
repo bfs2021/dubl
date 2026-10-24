@@ -119,4 +119,16 @@ describe("мини-markdown", () => {
     const s = splitSections("# T\nintro\n## A\ntext\n```\n## не заголовок\n```\n## B\nx");
     expect(s.map((x) => x.title)).toEqual(["", "A", "B"]);
   });
+  it("переводы строк Windows (\\r\\n) не вешают рендер: списки, заголовки и разделы те же", () => {
+    // git на Windows по умолчанию отдаёт ABOUT.md с \r\n — раньше список с \r в конце строки зацикливал рендер до нехватки памяти
+    const md = "## Раздел\r\nтекст\r\n\r\n- раз\r\n- два\r\n  - вложенный\r\n\r\n1. первый\r\n";
+    const { container } = render(<Markdown md={md} />);
+    expect(container.querySelectorAll("li")).toHaveLength(4);
+    expect(container.textContent).not.toMatch(/\r/);
+    expect(splitSections(md).map((x) => x.title)).toEqual(["Раздел"]);
+  });
+  it("вложенный пункт без родителя сразу после абзаца — не вечный цикл", () => {
+    const { container } = render(<Markdown md={"абзац\n  - сирота\nещё"} />);
+    expect(container.textContent).toContain("сирота");
+  });
 });

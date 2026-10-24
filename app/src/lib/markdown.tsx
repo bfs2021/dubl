@@ -12,6 +12,9 @@ export function stripComments(md: string): string {
   return md.replace(/<!--[\s\S]*?-->/g, "");
 }
 
+/** Переводы строк к \n: на Windows git по умолчанию отдаёт файлы с \r\n, а `.` в регулярках не ест \r. */
+const normalize = (md: string) => stripComments(md.replace(/\r\n?/g, "\n"));
+
 export interface Section { id: string; title: string; body: string }
 
 /** Режет документ по заголовкам второго уровня. Всё до первого «##» — вступление (title пустой). */
@@ -19,7 +22,7 @@ export function splitSections(md: string): Section[] {
   const out: Section[] = [];
   let cur: Section = { id: "intro", title: "", body: "" };
   let fence = false;
-  for (const line of stripComments(md).split("\n")) {
+  for (const line of normalize(md).split("\n")) {
     if (/^```/.test(line)) fence = !fence;
     const m = !fence && line.match(/^##\s+(.+?)\s*$/);
     if (m) {
@@ -55,7 +58,7 @@ function inline(text: string, key: string): ReactNode[] {
 const cells = (line: string) => line.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
 
 export function Markdown({ md, className }: { md: string; className?: string }) {
-  const lines = stripComments(md).split("\n");
+  const lines = normalize(md).split("\n");
   const nodes: ReactNode[] = [];
   let i = 0;
   let n = 0;
@@ -108,6 +111,7 @@ export function Markdown({ md, className }: { md: string; className?: string }) 
         else break;
         i++;
       }
+      if (items.length === 0) { nodes.push(<p key={key()}>{inline(line.trim(), `p${n}`)}</p>); i++; continue; }   // страховка: цикл всегда двигается
       const k = key();
       const List = ordered ? "ol" : "ul";
       nodes.push(
@@ -128,5 +132,5 @@ export function Markdown({ md, className }: { md: string; className?: string }) 
 
 /** Только текст, без разметки: для поиска по справке. */
 export function plainText(md: string): string {
-  return stripComments(md).replace(/\[([^\]]+)\]\([^)]*\)/g, "$1").replace(/[*`|>#]/g, " ").replace(/\s+/g, " ").trim();
+  return normalize(md).replace(/\[([^\]]+)\]\([^)]*\)/g, "$1").replace(/[*`|>#]/g, " ").replace(/\s+/g, " ").trim();
 }
