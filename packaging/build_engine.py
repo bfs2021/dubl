@@ -53,6 +53,49 @@ def host_triple() -> str:
     sys.exit("rustc не найден: поставьте Rust (https://rustup.rs)")
 
 
+def fix_linux_libs(engine_dir: Path, venv: Path) -> None:
+    """Linux: каждой .so — её зависимости рядом, чтобы AppImage собрался.
+
+    linuxdeploy (AppImage) проверяет зависимости каждого ELF-файла по отдельности: RPATH=$ORIGIN считается от папки,
+    где лежит сам файл. PyInstaller кладёт копию библиотеки из numpy.libs/scipy.libs в корень _internal, а её
+    зависимость (libquadmath-…so) оставляет только в *.libs — linuxdeploy её «не находит» и падает
+    («Could not find dependency: libquadmath-96973f99.so.0.0.0»). Движку это не мешает (библиотека уже загружена),
+    поэтому чиним только раскладку: кладём недостающую библиотеку рядом с тем, кому она нужна (по ldd).
+    Где искать: сама сборка, затем *.libs пакетов в окружении сборки. Что не нашлось — ошибка сборки сразу,
+    а не через 10 минут на упаковке AppImage."""
+    if not sys.platform.startswith("linux") or not shutil.which("ldd"):
+        return
+    by_name: dict[str, Path] = {}
+    pools = [engine_dir, *sorted(venv.glob("lib/python3*/site-packages/*.libs"))]
+    for pool in pools:
+        for f in sorted(pool.rglob("*.so*")):
+            if f.is_file() and not f.is_symlink():
+                by_name.setdefault(f.name, f)
+    env = {k: v for k, v in os.environ.items() if k != "LD_LIBRARY_PATH"}
+    missing: list[str] = []
+    for _round in range(5):
+        added, missing = 0, []
+        for f in sorted(engine_dir.rglob("*")):
+            if not f.is_file() or f.is_symlink() or not (".so" in f.name or f.name == "dubl-engine"):
+                continue
+            out = subprocess.run(["ldd", str(f)], capture_output=True, text=True, encoding="utf-8", errors="replace",
+                                 env=env, check=False).stdout
+            for line in out.splitlines():
+                name, _, rest = line.strip().partition(" => ")
+                if rest.strip() != "not found":
+                    continue
+                if name in by_name and not (f.parent / name).exists():
+                    shutil.copy2(by_name[name], f.parent / name)
+                    print(f"  {f.relative_to(engine_dir)}: нужна {name} → положил рядом", flush=True)
+                    added += 1
+                else:
+                    missing.append(f"{f.relative_to(engine_dir)} → {name}")
+        if not added:
+            break
+    if missing:
+        sys.exit("Не нашлись библиотеки (AppImage не соберётся):\n  " + "\n  ".join(sorted(set(missing))))
+
+
 def venv_py(venv: Path) -> Path:
     return venv / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
 
@@ -90,6 +133,7 @@ def main() -> None:
     engine_dir = dist / "engine"
     if not (engine_dir / f"dubl-engine{EXE}").exists():
         sys.exit("PyInstaller не создал dist/engine/dubl-engine")
+    fix_linux_libs(engine_dir, venv)
 
     # 4. лаунчер (Rust) — единственный файл, который Tauri знает как sidecar
     triple = host_triple()

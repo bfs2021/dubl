@@ -37,9 +37,10 @@ jobs:
           # Intel-Mac не собираем: torch 2.5.1 для macOS x86_64 в PyPI нет (PyTorch прекратил сборки), нейросети не встанут.
           # ubuntu-22.04: старее glibc — AppImage/deb запустятся и на более старых дистрибутивах
           all_ = [
-              {"name": "macOS (Apple Silicon) · dmg", "os": "macos-latest", "platform": "macos"},
-              {"name": "Windows x64 · nsis + msi", "os": "windows-latest", "platform": "windows"},
-              {"name": "Linux x64 · AppImage + deb", "os": "ubuntu-22.04", "platform": "linux"},
+              # main — главный установщик ОС (обязан выгрузиться), extra — запасной (выгружается, если хватает места)
+              {"name": "macOS (Apple Silicon) · dmg", "os": "macos-latest", "platform": "macos", "main": "dmg/*.dmg", "extra": ""},
+              {"name": "Windows x64 · nsis + msi", "os": "windows-latest", "platform": "windows", "main": "nsis/*.exe", "extra": "msi/*.msi"},
+              {"name": "Linux x64 · AppImage + deb", "os": "ubuntu-22.04", "platform": "linux", "main": "appimage/*.AppImage", "extra": "deb/*.deb"},
           ]
           want = {p.strip().lower() for p in os.environ["PLATFORMS"].split(",") if p.strip()}
           inc = [m for m in all_ if m["platform"] in want]
@@ -157,23 +158,32 @@ jobs:
             --config ${{ github.workspace }}/packaging/tauri-config/common.json
             --config ${{ github.workspace }}/packaging/tauri-config/${{ matrix.platform }}.json
 
-      # Установщики как артефакты запуска — всегда (в том числе и без тега), чтобы их можно было скачать и проверить
-      - name: Установщики → артефакты запуска
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: dubl-${{ matrix.platform }}
-          if-no-files-found: error
-          retention-days: 14
-          path: |
-            app/src-tauri/target/release/bundle/dmg/*.dmg
-            app/src-tauri/target/release/bundle/nsis/*.exe
-            app/src-tauri/target/release/bundle/msi/*.msi
-            app/src-tauri/target/release/bundle/appimage/*.AppImage
-            app/src-tauri/target/release/bundle/deb/*.deb
-
       # Ставим/распаковываем каждый установщик в папку с кириллицей и пробелом и запускаем из него движок:
       # self-check (ffmpeg из ресурсов, UTF-8), READY, /health, /projects — ловит сломанную упаковку, а не только сборку
       - name: Дымовая проверка установщиков
         if: matrix.platform != 'macos'
         run: python packaging/smoke_installer.py app/src-tauri/target/release/bundle
+
+      # Установщики как артефакты запуска — всегда (в том числе и без тега), чтобы их можно было скачать и проверить.
+      # На бесплатном тарифе на ВСЕ артефакты аккаунта — 500 МБ: ручные сборки живут 3 дня, запасной установщик
+      # (msi, deb) — отдельным артефактом и без падения, если места не хватило.
+      - name: Установщик → артефакт запуска
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: dubl-${{ matrix.platform }}
+          if-no-files-found: error
+          retention-days: ${{ github.ref_type == 'tag' && 14 || 3 }}
+          compression-level: 0
+          path: app/src-tauri/target/release/bundle/${{ matrix.main }}
+
+      - name: Запасной установщик → артефакт запуска
+        if: ${{ !cancelled() && matrix.extra != '' }}
+        continue-on-error: true
+        uses: actions/upload-artifact@v7
+        with:
+          name: dubl-${{ matrix.platform }}-extra
+          if-no-files-found: warn
+          retention-days: ${{ github.ref_type == 'tag' && 14 || 3 }}
+          compression-level: 0
+          path: app/src-tauri/target/release/bundle/${{ matrix.extra }}
