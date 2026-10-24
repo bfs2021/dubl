@@ -54,6 +54,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+      # AppImage: linuxdeploy не должен трогать strip-ом файлы движка (PyInstaller-сборка со своими .so)
+      NO_STRIP: "true"
       # тег v* — всегда релиз; ручной запуск — только если включено «release»
       PUBLISH: ${{ github.ref_type == 'tag' || (github.event_name == 'workflow_dispatch' && inputs.release) }}
     strategy:
@@ -134,6 +136,7 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: >-
+            --verbose
             --config ${{ github.workspace }}/packaging/tauri-config/common.json
             --config ${{ github.workspace }}/packaging/tauri-config/${{ matrix.platform }}.json
 
@@ -150,11 +153,13 @@ jobs:
         with:
           projectPath: app
           args: >-
+            --verbose
             --config ${{ github.workspace }}/packaging/tauri-config/common.json
             --config ${{ github.workspace }}/packaging/tauri-config/${{ matrix.platform }}.json
 
       # Установщики как артефакты запуска — всегда (в том числе и без тега), чтобы их можно было скачать и проверить
       - name: Установщики → артефакты запуска
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
           name: dubl-${{ matrix.platform }}
@@ -166,3 +171,9 @@ jobs:
             app/src-tauri/target/release/bundle/msi/*.msi
             app/src-tauri/target/release/bundle/appimage/*.AppImage
             app/src-tauri/target/release/bundle/deb/*.deb
+
+      # Ставим/распаковываем каждый установщик в папку с кириллицей и пробелом и запускаем из него движок:
+      # self-check (ffmpeg из ресурсов, UTF-8), READY, /health, /projects — ловит сломанную упаковку, а не только сборку
+      - name: Дымовая проверка установщиков
+        if: matrix.platform != 'macos'
+        run: python packaging/smoke_installer.py app/src-tauri/target/release/bundle
