@@ -258,7 +258,7 @@ def test_api_settings_report_who_answers(client):
     import json
 
     from dubl_engine import settings as st
-    raw = json.loads(st.settings_path().read_text())
+    raw = json.loads(st.settings_path().read_text(encoding="utf-8"))
     assert "tasks" not in raw["llm"] and "can_answer" not in raw["llm"]["providers"][0]
     assert raw["llm"]["providers"][1]["model"] == "deepseek-flash"
 

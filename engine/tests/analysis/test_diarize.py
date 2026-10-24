@@ -138,7 +138,7 @@ def shared_models(monkeypatch):
 def _voices_available() -> list[str]:
     if sys.platform != "darwin" or not shutil.which("say"):
         return []
-    out = subprocess.run(["say", "-v", "?"], capture_output=True, text=True, check=False).stdout
+    out = subprocess.run(["say", "-v", "?"], capture_output=True, text=True, check=False, encoding="utf-8", errors="replace").stdout
     names = [l.split("  ")[0].strip() for l in out.splitlines()]
     return [n for n in ("Milena", "Samantha", "Daniel", "Yuri", "Alex") if n in names]
 

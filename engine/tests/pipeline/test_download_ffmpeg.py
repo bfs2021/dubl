@@ -16,7 +16,7 @@ from dubl_engine.pipeline import download
 
 def _fake_bin(d: Path, name: str) -> None:
     p = d / (name + (".exe" if os.name == "nt" else ""))
-    p.write_text("#!/bin/sh\n")
+    p.write_text("#!/bin/sh\n", encoding="utf-8")
     p.chmod(p.stat().st_mode | stat.S_IEXEC)
 
 

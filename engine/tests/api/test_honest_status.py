@@ -112,7 +112,7 @@ def test_recover_removes_half_deleted_project_folder(tmp_path):
     st = ProjectStore(tmp_path / "projects")
     trash = st.root / ".trash-abc-123456"
     (trash / "scenes").mkdir(parents=True)
-    (trash / "project.json").write_text("{}")
+    (trash / "project.json").write_text("{}", encoding="utf-8")
     st.recover_interrupted()
     assert not trash.exists()
 
@@ -162,7 +162,7 @@ def test_killed_engine_mid_analysis_leaves_no_partial_analysis(tmp_path, simple_
         print(p.id, flush=True)
         analyze_project(st, p.id, Ctx(), settings=AppSettings())
     """)
-    proc = subprocess.Popen([sys.executable, "-c", script], stdout=subprocess.PIPE, text=True)
+    proc = subprocess.Popen([sys.executable, "-c", script], stdout=subprocess.PIPE, text=True, encoding="utf-8", errors="replace")
     try:
         pid = proc.stdout.readline().strip()
         deadline = time.monotonic() + 60

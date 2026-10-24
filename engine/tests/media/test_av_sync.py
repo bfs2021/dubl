@@ -3,6 +3,14 @@
 Баг слепого теста №3: в готовом ролике звук 10,458 с, видео 10,292 с. Причины: вырезка по точному времени давала видео,
 которое «стартовало» с 0,04 с, а звук — с нуля; `-shortest` резал хвост кадров. Тесты на синтетическом видео, где
 вспышка и щелчок в один момент, и сцена начинается вне начала GOP.
+
+Как меряем. Все времена — на шкале «от начала файла» (так их видит движок: звук для разбора декодируется с начала файла,
+`-ss` у ffmpeg тоже отсчитывается от начала файла). ffmpeg 7.0 (Linux-сборка johnvansickle) пишет задержку кодера AAC
+в mkv как отрицательный start_time файла (−0,021 с), и pts кадров с этой шкалой расходятся — поэтому вспышки переводим
+в неё (pts − start_time). Кроме того, вспышка в исходнике сама стоит на сетке кадров: щелчок на 6,5 с, а кадр при
+25 к/с — 6,52 с; это свойство фикстуры, а не продукта, поэтому сверяем расхождение вспышки и щелчка в клипе
+с тем же расхождением в исходнике. Остаётся настоящая ошибка вырезки: картинка приводится к сетке кадров от нуля
+и может сдвинуться не больше чем на полкадра (≤ 21 мс при 23,976 к/с) — это и проверяет TOL.
 """
 from __future__ import annotations
 
@@ -47,6 +55,20 @@ def flash_src(request, tmp_path_factory):
     return out
 
 
+@pytest.fixture(scope="module")
+def ref(flash_src, tmp_path_factory) -> dict:
+    """Опорные значения исходника: сдвиг шкалы файла и собственное расхождение «вспышка − щелчок» для каждой вспышки."""
+    tmp = tmp_path_factory.mktemp("ref")
+    flashes, clicks = _flash_times(flash_src), _click_times(flash_src, tmp)
+    assert len(flashes) == len(clicks) == len(FLASHES), (flashes, clicks)
+    shift = -_file_start(flash_src)
+    return {"shift": shift, "offset": {t: f - c for t, f, c in zip(FLASHES, flashes, clicks, strict=True)}}
+
+
+def _file_start(path) -> float:
+    return float(ffprobe_json(path, "-show_format")["format"].get("start_time") or 0)
+
+
 def _streams(path) -> dict:
     return {s["codec_type"]: s for s in ffprobe_json(path, "-show_streams")["streams"]}
 
@@ -56,9 +78,10 @@ def _end(stream) -> float:
 
 
 def _flash_times(path) -> list[float]:
-    """Времена начала вспышек (первый яркий кадр каждой серии) по pts кадров."""
+    """Времена начала вспышек (первый яркий кадр каждой серии) на шкале «от начала файла» (pts − start_time файла)."""
     frames = ffprobe_json(path, "-show_frames", "-select_streams", "v", "-show_entries", "frame=pts_time,best_effort_timestamp_time")
-    pts = sorted(float(f.get("pts_time") or f.get("best_effort_timestamp_time")) for f in frames["frames"])
+    t0 = _file_start(path)
+    pts = sorted(float(f.get("pts_time") or f.get("best_effort_timestamp_time")) - t0 for f in frames["frames"])
     raw = subprocess.run([find_binary("ffmpeg"), "-v", "error", "-i", str(path), "-vf", "scale=8:8,format=gray",
                           "-fps_mode", "passthrough", "-f", "rawvideo", "-"], capture_output=True, check=True).stdout
     lum = np.frombuffer(raw, dtype=np.uint8).reshape(-1, 64).mean(axis=1)
@@ -86,11 +109,15 @@ def _click_times(path, tmp_path) -> list[float]:
     return out
 
 
-def _assert_sync(path, tmp_path, expected: list[float]) -> None:
+def _assert_sync(path, tmp_path, ref: dict, events: list[tuple[float, float]]) -> None:
+    """events: (момент вспышки в исходнике по FLASHES, где он должен оказаться в ролике на шкале исходника без сдвига)."""
     flashes, clicks = _flash_times(path), _click_times(path, tmp_path)
-    assert len(flashes) == len(clicks) == len(expected), (flashes, clicks, expected)
-    for f, c, e in zip(flashes, clicks, expected, strict=True):
-        assert abs(f - c) <= TOL, f"вспышка {f:.3f} с, щелчок {c:.3f} с: разъехались (ждали {e:.3f})"
+    assert len(flashes) == len(clicks) == len(events), (flashes, clicks, events)
+    for f, c, (src_t, e) in zip(flashes, clicks, events, strict=True):
+        e += ref["shift"]
+        own = ref["offset"][src_t]
+        assert abs((f - c) - own) <= TOL, \
+            f"вспышка {f:.3f} с, щелчок {c:.3f} с: разъехались на {(f - c) * 1000:.0f} мс, в исходнике {own * 1000:.0f} мс"
         assert abs(c - e) <= TOL, f"щелчок на {c:.3f} с, ждали {e:.3f} с"
 
 
@@ -99,25 +126,25 @@ def _scene_audio(src, a, b, tmp_path, name="mix.wav"):
 
 
 @pytest.mark.parametrize("start,end", [(1.37, 4.9), (2.123, 6.77), (5.31, 9.9)])
-def test_clip_and_render_same_length_and_in_sync(flash_src, tmp_path, start, end):
+def test_clip_and_render_same_length_and_in_sync(flash_src, ref, tmp_path, start, end):
     """Вырезка не по ключевому кадру и не по сетке кадров: длины потоков равны, вспышка и щелчок совпадают."""
     clip = cut_scene_video(flash_src, start, end, tmp_path / "clip.mp4", audio_stream_index=1)
     s = _streams(clip)
     assert abs(float(s["video"]["start_time"])) <= 0.001, "видео клипа должно начинаться с нуля"
     assert abs(_end(s["video"]) - (end - start)) <= TOL
     assert abs(_end(s["audio"]) - _end(s["video"])) <= TOL
-    want = [t - start for t in FLASHES if start <= t - 0.0 < end - 0.1]
-    _assert_sync(clip, tmp_path, want)
+    want = [(t, t - start) for t in FLASHES if start <= t < end - 0.1]
+    _assert_sync(clip, tmp_path, ref, want)
 
     mix = _scene_audio(flash_src, start, end, tmp_path)
     out = render_video(clip, mix, tmp_path / "out.mp4", RenderSettings(output_path=str(tmp_path / "out.mp4")))
     so = _streams(out)
     assert abs(_end(so["audio"]) - _end(so["video"])) <= TOL, (_end(so["audio"]), _end(so["video"]))
     assert abs(_end(so["video"]) - (end - start)) <= 0.05
-    _assert_sync(out, tmp_path, want)
+    _assert_sync(out, tmp_path, ref, want)
 
 
-def test_render_other_aspects_same_length(flash_src, tmp_path):
+def test_render_other_aspects_same_length(flash_src, ref, tmp_path):
     clip = cut_scene_video(flash_src, 1.37, 4.9, tmp_path / "clip.mp4", audio_stream_index=1)
     mix = _scene_audio(flash_src, 1.37, 4.9, tmp_path)
     for name, aspect in (("v", RenderAspect.V9_16), ("sq", RenderAspect.SQ1_1)):
@@ -125,7 +152,7 @@ def test_render_other_aspects_same_length(flash_src, tmp_path):
                                                                               output_path=str(tmp_path / f"{name}.mp4")))
         so = _streams(out)
         assert abs(_end(so["audio"]) - _end(so["video"])) <= TOL
-        _assert_sync(out, tmp_path, [3.2 - 1.37])
+        _assert_sync(out, tmp_path, ref, [(3.2, 3.2 - 1.37)])
 
 
 def test_render_with_longer_or_shorter_audio_keeps_video_length(flash_src, tmp_path):
@@ -142,7 +169,7 @@ def test_render_with_longer_or_shorter_audio_keeps_video_length(flash_src, tmp_p
         assert abs(_end(so["audio"]) - _end(so["video"])) <= TOL, name
 
 
-def test_legacy_clip_starting_after_zero_is_aligned(flash_src, tmp_path):
+def test_legacy_clip_starting_after_zero_is_aligned(flash_src, ref, tmp_path):
     """Клипы, вырезанные старой версией (видео с 0,04 с, звук с нуля), при рендере выравниваются, а не рассинхронизируются."""
     start, end = 1.37, 4.9
     legacy = tmp_path / "legacy.mp4"
@@ -153,10 +180,10 @@ def test_legacy_clip_starting_after_zero_is_aligned(flash_src, tmp_path):
     out = render_video(legacy, mix, tmp_path / "out.mp4", RenderSettings(output_path=str(tmp_path / "out.mp4")))
     so = _streams(out)
     assert abs(_end(so["audio"]) - _end(so["video"])) <= TOL
-    _assert_sync(out, tmp_path, [3.2 - start])
+    _assert_sync(out, tmp_path, ref, [(3.2, 3.2 - start)])
 
 
-def test_joined_scenes_equal_length_and_in_sync(flash_src, tmp_path):
+def test_joined_scenes_equal_length_and_in_sync(flash_src, ref, tmp_path):
     """Склейка двух сцен: общая длина звука = длине видео, вспышки и щелчки совпадают в обеих сценах."""
     scenes = [(1.37, 4.2), (5.31, 8.0)]
     videos, parts = [], []
@@ -174,4 +201,4 @@ def test_joined_scenes_equal_length_and_in_sync(flash_src, tmp_path):
     assert abs(_end(so["video"]) - total) <= TOL
     assert abs(_end(so["audio"]) - _end(so["video"])) <= TOL, (_end(so["audio"]), _end(so["video"]))
     first = video_duration(videos[0])
-    _assert_sync(out, tmp_path, [3.2 - scenes[0][0], first + 6.5 - scenes[1][0]])
+    _assert_sync(out, tmp_path, ref, [(3.2, 3.2 - scenes[0][0]), (6.5, first + 6.5 - scenes[1][0])])

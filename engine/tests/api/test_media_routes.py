@@ -50,7 +50,7 @@ def test_source_errors_and_path_protection(env, simple_mp4, tmp_path):
     assert c.get(f"/files/{gone.id}/source").status_code == 404
     assert c.get("/files/nope/source").status_code == 404
     p = store.create(simple_mp4, probe(simple_mp4), title="t")
-    (tmp_path / "secret.txt").write_text("тайна")
+    (tmp_path / "secret.txt").write_text("тайна", encoding="utf-8")
     for bad in ("../secret.txt", "..%2F..%2Fsecret.txt", "../../data/settings.json", "%2e%2e/secret.txt"):
         assert c.get(f"/files/{p.id}/{bad}").status_code in (404, 422), bad
     # source — не путь внутри папки проекта: «подсунуть» чужой файл через имя нельзя

@@ -28,7 +28,7 @@ def real_find(monkeypatch):
 
 
 def _script(path, body: str):
-    path.write_text("#!/bin/sh\n" + body)
+    path.write_text("#!/bin/sh\n" + body, encoding="utf-8")
     path.chmod(path.stat().st_mode | stat.S_IEXEC)
     return str(path)
 
@@ -192,26 +192,26 @@ async def test_codex_exec_flags_and_prompt_via_stdin(fake_codex):
     p = make_provider(_cfg(K.CODEX_CLI, model="gpt-x"))
     assert isinstance(p, CodexCliProvider)
     assert await p.complete("системный", "вопрос", json_schema={"type": "object"}) == "Привет, мир"
-    args = (fake_codex / "args.txt").read_text().split()
+    args = (fake_codex / "args.txt").read_text(encoding="utf-8").split()
     assert args[0] == "exec" and args[-1] == "-"                       # промпт со stdin
     assert args[args.index("--sandbox") + 1] == "read-only"            # модель ничего не пишет на диск
     assert "--skip-git-repo-check" in args and "--output-last-message" in args
     assert args[args.index("--model") + 1] == "gpt-x"
-    stdin = (fake_codex / "stdin.txt").read_text()
+    stdin = (fake_codex / "stdin.txt").read_text(encoding="utf-8")
     assert "системный" in stdin and "вопрос" in stdin and "properties" in stdin or "object" in stdin
 
 
 @pytest.mark.asyncio
 async def test_codex_default_model_has_no_model_flag(fake_codex):
     await CodexCliProvider(_cfg(K.CODEX_CLI, model="default")).complete("s", "u")
-    assert "--model" not in (fake_codex / "args.txt").read_text().split()
+    assert "--model" not in (fake_codex / "args.txt").read_text(encoding="utf-8").split()
 
 
 @pytest.mark.asyncio
 async def test_codex_old_version_retries_without_optional_flags(fake_codex, monkeypatch):
     monkeypatch.setenv("FAKE_MODE", "old")
     assert await CodexCliProvider(_cfg(K.CODEX_CLI)).complete("s", "u") == "Привет, мир"
-    assert "--ephemeral" not in (fake_codex / "args.txt").read_text()
+    assert "--ephemeral" not in (fake_codex / "args.txt").read_text(encoding="utf-8")
 
 
 @pytest.mark.asyncio

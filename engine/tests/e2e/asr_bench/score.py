@@ -258,7 +258,7 @@ def main():
         HYP = Path(args.hyp_dir)
     if args.audio_dir:
         AUDIO = Path(args.audio_dir)
-    ref = json.loads(Path(args.ref).read_text())
+    ref = json.loads(Path(args.ref).read_text(encoding="utf-8"))
     md, allres = [], {}
     for set_name, st in ref["sets"].items():
         for tag in st["tags"]:
@@ -269,7 +269,7 @@ def main():
             md.append("| модель | WER | CER | потеряно реплик | выдумано слов | короткое 1-е слово потеряно | начало, мс (ср/p90/сдвиг) | конец, мс (ср/p90/сдвиг) | границ > 300 мс (нач+кон) | нет границы | слито | разрезано | пунктуация | реплик гип. |")
             md.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
             for f in files:
-                hyp = json.loads(f.read_text())
+                hyp = json.loads(f.read_text(encoding="utf-8"))
                 model = f.name[len("hyp_"):-len(f"_{tag}.json")]
                 rows = [score_piece(hyp, p) for p in st["pieces"]]
                 a = agg(rows)
@@ -288,7 +288,7 @@ def main():
         if ff:
             files = sorted(HYP.glob(f'hyp_*_{ff["tag"]}.json'))
             env = env_of(AUDIO / ff["voice_env"]) if ff.get("voice_env") and (AUDIO / ff["voice_env"]).exists() else None
-            hyps = {f.name[len("hyp_"):-len(f'_{ff["tag"]}.json')]: json.loads(f.read_text()) for f in files}
+            hyps = {f.name[len("hyp_"):-len(f'_{ff["tag"]}.json')]: json.loads(f.read_text(encoding="utf-8")) for f in files}
             base = {k: v for k, v in hyps.items() if k in ff.get("support_models", hyps.keys())}
             md.append(f'\n### {set_name} · выдумки по всему файлу `{ff["tag"]}`\n')
             md.append("| модель | реплик | надписи-пометки | повторы/зацикливание | в голосовом стеме тишина | нет ни у одной другой модели |")
@@ -298,8 +298,8 @@ def main():
                 r = full_file_fabrications(h, env, others)
                 allres[f"{set_name}/full/{m}"] = r
                 md.append(f'| {m} | {r["segments"]} | {len(r["caption"])} | {len(r["loops"])} | {len(r["no_voice"])} | {len(r["lonely"])} |')
-    Path(args.out).write_text("\n".join(md) + "\n")
-    Path(args.out).with_suffix(".json").write_text(json.dumps(allres, ensure_ascii=False, indent=1))
+    Path(args.out).write_text("\n".join(md) + "\n", encoding="utf-8")
+    Path(args.out).with_suffix(".json").write_text(json.dumps(allres, ensure_ascii=False, indent=1), encoding="utf-8")
     print("\n".join(md))
 
 

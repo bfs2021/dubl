@@ -6,7 +6,7 @@ from dubl_engine.analysis.palette import PALETTE
 from dubl_engine.analysis.subtitles import parse_subtitle_file, speakers_from_names
 from dubl_engine.media.extract import extract_subtitles
 from dubl_engine.models import Line
-from dubl_engine.util import EngineError
+from dubl_engine.util import EngineError, ffprobe_json
 
 
 def test_palette():
@@ -75,7 +75,11 @@ def test_parse_ass_from_rich_mkv(rich_mkv, tmp_path):
     assert len(lines) == 2
     assert lines[0].speaker_id == "name:Barsik" and lines[0].text == "Who touched my sausage?"
     assert lines[1].speaker_id == "name:Mila" and lines[1].text == "Not me. I was asleep."
-    assert lines[0].start == pytest.approx(2.0) and lines[1].end == pytest.approx(8.0)
+    # Время — на шкале ffmpeg, где 0 = начало файла. ffmpeg 7.0 (Linux, johnvansickle) показывает задержку кодера AAC
+    # в mkv как отрицательный start_time файла (−0,021…−0,023 с) и сдвигает на столько же ВСЕ потоки — и звук, и субтитры,
+    # так что реплика остаётся на своей речи. Поэтому ждём 2,0 − start_time, а не ровно 2,0 (ASS хранит сотые — допуск 0,01).
+    shift = -min(0.0, float(ffprobe_json(rich_mkv, "-show_format")["format"].get("start_time") or 0))
+    assert lines[0].start == pytest.approx(2.0 + shift, abs=0.01) and lines[1].end == pytest.approx(8.0 + shift, abs=0.01)
 
 
 def test_parse_srt_from_rich_mkv(rich_mkv, tmp_path):

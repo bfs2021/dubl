@@ -42,4 +42,4 @@ print(json.dumps({k: v for k, v in res.items() if k != "lines"}, ensure_ascii=Fa
 for s, e, sp, text in res["lines"]:
     print(f"{s:7.2f}–{e:6.2f} {sp}: {text}")
 if args.out:
-    Path(args.out).write_text(json.dumps(res, ensure_ascii=False, indent=1))
+    Path(args.out).write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8")

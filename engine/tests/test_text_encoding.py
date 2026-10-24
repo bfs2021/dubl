@@ -10,7 +10,8 @@ import ast
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-FILES = sorted((ROOT / "engine" / "src").rglob("*.py")) + sorted((ROOT / "packaging").glob("*.py"))
+FILES = [*sorted((ROOT / "engine" / "src").rglob("*.py")), *sorted((ROOT / "engine" / "tests").rglob("*.py")),
+         *sorted((ROOT / "packaging").glob("*.py"))]
 
 _TEXT_METHODS = {"read_text": 0, "write_text": 1}          # индекс позиционного encoding
 _SUBPROCESS = {"run", "Popen", "check_output", "check_call", "call"}

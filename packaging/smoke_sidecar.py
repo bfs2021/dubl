@@ -3,7 +3,11 @@
 
   python packaging/smoke_sidecar.py [--stage DIR] [путь/к/dubl-engine-<triple>[.exe]]
   DIR — папка с binaries/ и resources/ (по умолчанию packaging/build/stage; для релиза — app/src-tauri)
-Скрипт сам собирает раскладку «как в установленной программе» во временной папке. Выход 0 — всё хорошо.
+Скрипт сам собирает раскладку «как в установленной программе» во временной папке (с кириллицей в путях). Выход 0 — всё хорошо.
+
+  python packaging/smoke_sidecar.py --installed ПУТЬ/К/dubl-engine[.exe]
+Проверка уже установленной программы (распакованный AppImage/deb, установленный NSIS): движок запускается как есть,
+сам находит свои ресурсы и ffmpeg; папка данных — с кириллицей и пробелом.
 """
 from __future__ import annotations
 
@@ -41,9 +45,61 @@ def alive(pid: int) -> bool:
     return subprocess.run(["kill", "-0", str(pid)], capture_output=True).returncode == 0
 
 
+def check_running(launcher: Path, env: dict[str, str], data: Path, *, runs: int = 3) -> None:
+    """READY, /health, список проектов, что-то создано в папке данных; затем мягкая остановка. Повторяем для времени старта."""
+    times = []
+    for i in range(runs):
+        p, port, dt = start([str(launcher), "--port", "0", "--data-dir", str(data)], env)
+        times.append(dt)
+        try:
+            if i == 0:
+                health = json.loads(urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=10).read())
+                assert health.get("ok") is True, health
+                print("health:", health)
+                projects = json.loads(urllib.request.urlopen(f"http://127.0.0.1:{port}/projects", timeout=10).read())
+                assert isinstance(projects, list), projects
+                assert data.is_dir() and any(data.iterdir()), f"движок ничего не создал в папке данных {data}"
+                print("папка данных с кириллицей:", data, "→", sorted(x.name for x in data.iterdir()))
+        finally:
+            p.terminate()
+            p.wait(15)
+    print("READY через, с:", ", ".join(f"{x:.2f}" for x in times), "(первый — холодный)")
+
+
+def self_check(launcher: Path, env: dict[str, str]) -> dict:
+    r = subprocess.run([str(launcher), "self-check"], capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       env=env)
+    if r.returncode != 0:
+        raise SystemExit(f"self-check: код {r.returncode}\n{r.stdout}\n{r.stderr}")
+    chk = json.loads(r.stdout)
+    print("self-check:", chk)
+    assert chk["frozen"] is True
+    return chk
+
+
+def installed(exe: Path) -> int:
+    """Программа уже установлена/распакована: ничего не подкладываем, движок должен найти всё сам."""
+    exe = exe.resolve()
+    env = dict(os.environ)
+    for k in ("DUBL_RESOURCE_DIR", "DUBL_ENGINE_DIR", "DUBL_FFMPEG_DIR", "DUBL_DATA_DIR"):
+        env.pop(k, None)
+    chk = self_check(exe, env)
+    assert chk.get("ffmpeg") and chk.get("ffprobe"), "движок не нашёл ffmpeg в своих ресурсах"
+    assert chk.get("ffmpeg_dir_env"), "лаунчер не передал движку DUBL_FFMPEG_DIR (ресурсы не найдены)"
+    tmp = Path(tempfile.mkdtemp(prefix="dubl-smoke-"))
+    try:
+        check_running(exe, env, tmp / "Дубль данные", runs=2)
+        print("OK")
+        return 0
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 def main() -> int:
     global STAGE
     args = sys.argv[1:]
+    if "--installed" in args:
+        return installed(Path(args[args.index("--installed") + 1]))
     if "--stage" in args:
         i = args.index("--stage")
         STAGE = Path(args[i + 1]).resolve()
@@ -64,25 +120,8 @@ def main() -> int:
         env.pop("DUBL_FFMPEG_DIR", None)
         data = tmp / "Данные Дубль-тест"
 
-        times = []
-        for i in range(3):
-            p, port, dt = start([str(launcher), "--port", "0", "--data-dir", str(data)], env)
-            times.append(dt)
-            if i == 0:
-                health = json.loads(urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=10).read())
-                assert health.get("ok") is True, health
-                print("health:", health)
-                projects = json.loads(urllib.request.urlopen(f"http://127.0.0.1:{port}/projects", timeout=10).read())
-                assert isinstance(projects, list), projects
-                assert data.is_dir() and any(data.iterdir()), f"движок ничего не создал в папке данных {data}"
-                print("папка данных с кириллицей:", data, "→", sorted(x.name for x in data.iterdir()))
-            p.terminate()
-            p.wait(15)
-        print("READY через, с:", ", ".join(f"{x:.2f}" for x in times), "(первый — холодный)")
-
-        chk = json.loads(subprocess.run([str(launcher), "self-check"], capture_output=True, text=True, encoding="utf-8", errors="replace", env=env, check=True).stdout)
-        print("self-check:", chk)
-        assert chk["frozen"] is True
+        check_running(launcher, env, data)
+        chk = self_check(launcher, env)
         if has_ff:
             assert str(app / "resources" / "ffmpeg") in (chk["ffmpeg"] or ""), "движок не увидел ffmpeg из ресурсов"
 

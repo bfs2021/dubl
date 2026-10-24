@@ -185,7 +185,7 @@ def step_shots(threshold: str = "0.3") -> None:
     t0 = time.time()
     cuts = detect_shot_cuts(H.TOS_RELEASE, threshold=threshold)
     dt = time.time() - t0
-    (A / f"cuts_{threshold}.json").write_text(json.dumps(cuts))
+    (A / f"cuts_{threshold}.json").write_text(json.dumps(cuts), encoding="utf-8")
     d = np.diff([0, *cuts])
     save(f"shots_{threshold}", {"threshold": threshold, "s": round(dt, 1), "cuts": len(cuts),
                                 "per_min": round(len(cuts) / (734.17 / 60), 1),
@@ -767,7 +767,7 @@ def step_snap() -> None:
     from dubl_engine.analysis.subtitles import parse_subtitle_file
     en = parse_subtitle_file(H.TOS_EN)
     lines = align_embedded_to_speech(en, load_lines(A / "whisper_large-v3-turbo.json"))
-    cuts = json.loads((A / "cuts_0.3.json").read_text())
+    cuts = json.loads((A / "cuts_0.3.json").read_text(encoding="utf-8"))
     res: dict = {"cuts": len(cuts)}
     t = time.time()
     # 1) выделение, начатое в середине реплики, расширяется до её границ и не режет слова

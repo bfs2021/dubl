@@ -125,7 +125,7 @@ def save(name: str, inp: str, data: dict) -> Path:
     tag = Path(inp).stem
     p = HYP / f"hyp_{name}_{tag}.json"
     data = {"model": name, "input": str(inp), "peak_rss_mb": round(peak_rss_mb(), 1), **data}
-    p.write_text(json.dumps(data, ensure_ascii=False, indent=1))
+    p.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
     n = len(data.get("segments", []))
     print(f"saved {p}  segments={n}  asr_s={data.get('asr_s')}  audio_s={data.get('audio_s')}  rss={data['peak_rss_mb']}MB",
           flush=True)

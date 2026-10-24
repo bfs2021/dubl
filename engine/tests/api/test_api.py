@@ -144,8 +144,8 @@ def test_key_not_echoed_in_validation_errors(make):
 def test_files_path_traversal_blocked(make, tmp_path):
     c, store = make()
     p = store.create("/x.mp4", _media(), title="t")
-    (tmp_path / "secret.txt").write_text("top secret")
-    (store.project_dir(p.id) / "ok.txt").write_text("fine")
+    (tmp_path / "secret.txt").write_text("top secret", encoding="utf-8")
+    (store.project_dir(p.id) / "ok.txt").write_text("fine", encoding="utf-8")
     assert c.get(f"/files/{p.id}/ok.txt").text == "fine"
     for bad in ("../../secret.txt", "..%2F..%2Fsecret.txt", "/etc/passwd", "%2e%2e/%2e%2e/secret.txt"):
         assert c.get(f"/files/{p.id}/{bad}").status_code in (404, 400), bad

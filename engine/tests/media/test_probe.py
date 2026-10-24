@@ -48,7 +48,7 @@ def test_probe_missing_file(tmp_path):
 
 def test_probe_not_media(tmp_path):
     f = tmp_path / "x.txt"
-    f.write_text("hello")
+    f.write_text("hello", encoding="utf-8")
     with pytest.raises(EngineError):
         probe(f)
 

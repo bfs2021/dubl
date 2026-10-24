@@ -61,5 +61,5 @@ out.write_text(json.dumps({
     "audio_s": round(sf.info(args.wav).duration, 2), "info": info, "notes": notes,
     "chunking": "приложение: analysis/speech.recognize",
     "peak_rss_mb": round(rss / 1e6 if sys.platform == "darwin" else rss / 1e3, 1), "segments": segs},
-    ensure_ascii=False, indent=1))
+    ensure_ascii=False, indent=1), encoding="utf-8")
 print("saved", out, "segments", len(segs), "s", dt, "lang", lang, "info", json.dumps(info, ensure_ascii=False))
