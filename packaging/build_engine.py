@@ -53,45 +53,48 @@ def host_triple() -> str:
     sys.exit("rustc не найден: поставьте Rust (https://rustup.rs)")
 
 
-def fix_linux_libs(engine_dir: Path, venv: Path) -> None:
-    """Linux: каждой .so — её зависимости рядом, чтобы AppImage собрался.
+def fix_linux_libs(engine_dir: Path, patchelf: str) -> None:
+    """Linux: каждая .so сборки должна находить свои зависимости сама, иначе AppImage не соберётся.
 
-    linuxdeploy (AppImage) проверяет зависимости каждого ELF-файла по отдельности: RPATH=$ORIGIN считается от папки,
-    где лежит сам файл. PyInstaller кладёт копию библиотеки из numpy.libs/scipy.libs в корень _internal, а её
-    зависимость (libquadmath-…so) оставляет только в *.libs — linuxdeploy её «не находит» и падает
-    («Could not find dependency: libquadmath-96973f99.so.0.0.0»). Движку это не мешает (библиотека уже загружена),
-    поэтому чиним только раскладку: кладём недостающую библиотеку рядом с тем, кому она нужна (по ldd).
-    Где искать: сама сборка, затем *.libs пакетов в окружении сборки. Что не нашлось — ошибка сборки сразу,
-    а не через 10 минут на упаковке AppImage."""
+    linuxdeploy (AppImage) проверяет зависимости каждого ELF-файла по отдельности. В колёсах numpy/scipy библиотеки
+    из numpy.libs/scipy.libs (libopenblas → libgfortran → libquadmath) лежат рядом друг с другом, но RPATH у них пустой:
+    сами по себе они друг друга не видят («Could not find dependency: libquadmath-96973f99.so.0.0.0»). Движку это
+    не мешает — их подгружает модуль-расширение по своему RPATH, — так что чиним только раскладку: если зависимость
+    лежит рядом — RPATH=$ORIGIN; если только где-то ещё в сборке — копия рядом + $ORIGIN (как сделал бы auditwheel).
+    Что не нашлось вовсе — ошибка сборки сразу, а не через 10 минут на упаковке."""
     if not sys.platform.startswith("linux") or not shutil.which("ldd"):
         return
     by_name: dict[str, Path] = {}
-    pools = [engine_dir, *sorted(venv.glob("lib/python3*/site-packages/*.libs"))]
-    for pool in pools:
-        for f in sorted(pool.rglob("*.so*")):
-            if f.is_file() and not f.is_symlink():
-                by_name.setdefault(f.name, f)
+    for f in sorted(engine_dir.rglob("*.so*")):
+        if f.is_file() and not f.is_symlink():
+            by_name.setdefault(f.name, f)
     env = {k: v for k, v in os.environ.items() if k != "LD_LIBRARY_PATH"}
+
+    def not_found(f: Path) -> list[str]:
+        out = subprocess.run(["ldd", str(f)], capture_output=True, text=True, encoding="utf-8", errors="replace",
+                             env=env, check=False).stdout
+        return [ln.strip().partition(" => ")[0] for ln in out.splitlines() if ln.strip().endswith("=> not found")]
+
+    def add_origin(f: Path) -> None:
+        cur = subprocess.run([patchelf, "--print-rpath", str(f)], capture_output=True, text=True, encoding="utf-8",
+                             errors="replace", check=True).stdout.strip()
+        if "$ORIGIN" not in cur.split(":"):
+            sh([patchelf, "--set-rpath", ":".join(x for x in ("$ORIGIN", cur) if x), f])
+
     missing: list[str] = []
-    for _round in range(5):
-        added, missing = 0, []
-        for f in sorted(engine_dir.rglob("*")):
-            if not f.is_file() or f.is_symlink() or not (".so" in f.name or f.name == "dubl-engine"):
-                continue
-            out = subprocess.run(["ldd", str(f)], capture_output=True, text=True, encoding="utf-8", errors="replace",
-                                 env=env, check=False).stdout
-            for line in out.splitlines():
-                name, _, rest = line.strip().partition(" => ")
-                if rest.strip() != "not found":
-                    continue
-                if name in by_name and not (f.parent / name).exists():
-                    shutil.copy2(by_name[name], f.parent / name)
-                    print(f"  {f.relative_to(engine_dir)}: нужна {name} → положил рядом", flush=True)
-                    added += 1
-                else:
-                    missing.append(f"{f.relative_to(engine_dir)} → {name}")
-        if not added:
-            break
+    for f in sorted(engine_dir.rglob("*.so*")):
+        if not f.is_file() or f.is_symlink():
+            continue
+        lost = not_found(f)
+        if not lost:
+            continue
+        for name in lost:
+            if not (f.parent / name).exists() and name in by_name:
+                shutil.copy2(by_name[name], f.parent / name)
+                print(f"  {f.relative_to(engine_dir)}: нужна {name} → положил рядом", flush=True)
+        if any((f.parent / name).exists() for name in lost):
+            add_origin(f)
+        missing += [f"{f.relative_to(engine_dir)} → {n}" for n in not_found(f)]
     if missing:
         sys.exit("Не нашлись библиотеки (AppImage не соберётся):\n  " + "\n  ".join(sorted(set(missing))))
 
@@ -123,7 +126,9 @@ def main() -> None:
     venv = BUILD / "venv"
     if not venv_py(venv).exists():
         sh([uv, "venv", "--python", "3.11", venv])
-    sh([uv, "pip", "install", "--python", venv_py(venv), "--reinstall-package", "dubl-engine", wheel, "pyinstaller>=6.10"])
+    linux = sys.platform.startswith("linux")
+    sh([uv, "pip", "install", "--python", venv_py(venv), "--reinstall-package", "dubl-engine", wheel, "pyinstaller>=6.10",
+        *(["patchelf"] if linux else [])])     # patchelf — для fix_linux_libs (колесо с PyPI, без apt)
 
     # 3. PyInstaller
     dist, work = BUILD / "dist", BUILD / "work"
@@ -133,7 +138,8 @@ def main() -> None:
     engine_dir = dist / "engine"
     if not (engine_dir / f"dubl-engine{EXE}").exists():
         sys.exit("PyInstaller не создал dist/engine/dubl-engine")
-    fix_linux_libs(engine_dir, venv)
+    if linux:
+        fix_linux_libs(engine_dir, str(venv_py(venv).parent / "patchelf"))
 
     # 4. лаунчер (Rust) — единственный файл, который Tauri знает как sidecar
     triple = host_triple()
