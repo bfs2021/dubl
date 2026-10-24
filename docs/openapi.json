@@ -1,0 +1,7015 @@
+{
+  "components": {
+    "schemas": {
+      "Analysis": {
+        "description": "Итог разбора всего видео. Делается один раз на проект.",
+        "properties": {
+          "asr_engine": {
+            "anyOf": [
+              {
+                "enum": [
+                  "whisper",
+                  "gigaam"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asr Engine"
+          },
+          "asr_notes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Asr Notes",
+            "type": "array"
+          },
+          "audio_stream_index": {
+            "title": "Audio Stream Index",
+            "type": "integer"
+          },
+          "chapters": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Chapter"
+            },
+            "title": "Chapters",
+            "type": "array"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "language_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Note"
+          },
+          "language_source": {
+            "anyOf": [
+              {
+                "enum": [
+                  "user",
+                  "speech",
+                  "track"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Source"
+          },
+          "lines": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Line"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "merge_suggestions": {
+            "default": [],
+            "items": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Merge Suggestions",
+            "type": "array"
+          },
+          "merged_lines": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": {},
+            "title": "Merged Lines",
+            "type": "object"
+          },
+          "shot_cuts": {
+            "default": [],
+            "items": {
+              "type": "number"
+            },
+            "title": "Shot Cuts",
+            "type": "array"
+          },
+          "speakers": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Speaker"
+            },
+            "title": "Speakers",
+            "type": "array"
+          },
+          "track_language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Track Language"
+          }
+        },
+        "required": [
+          "audio_stream_index"
+        ],
+        "title": "Analysis",
+        "type": "object"
+      },
+      "AnalyzeRequest": {
+        "description": "Повторный разбор: что угодно можно не передавать — разбор возьмёт те же значения по умолчанию, что при создании.",
+        "properties": {
+          "audio_stream_index": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audio Stream Index"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "maxLength": 8,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          }
+        },
+        "title": "AnalyzeRequest",
+        "type": "object"
+      },
+      "AppSettings": {
+        "properties": {
+          "asr_engine": {
+            "default": "auto",
+            "enum": [
+              "auto",
+              "whisper",
+              "gigaam"
+            ],
+            "title": "Asr Engine",
+            "type": "string"
+          },
+          "input_device": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Device"
+          },
+          "latency_ms": {
+            "default": 0.0,
+            "maximum": 2000.0,
+            "minimum": 0.0,
+            "title": "Latency Ms",
+            "type": "number"
+          },
+          "llm": {
+            "$ref": "#/components/schemas/LLMSettings",
+            "default": {
+              "providers": [],
+              "routing": {}
+            }
+          },
+          "mic_profile": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MicProfile"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "processing_device": {
+            "default": "auto",
+            "title": "Processing Device",
+            "type": "string"
+          },
+          "separation_quality": {
+            "default": "fast",
+            "enum": [
+              "fast",
+              "best"
+            ],
+            "title": "Separation Quality",
+            "type": "string"
+          },
+          "target_lang": {
+            "default": "ru",
+            "maxLength": 16,
+            "minLength": 2,
+            "title": "Target Lang",
+            "type": "string"
+          },
+          "whisper_model": {
+            "default": "large-v3-turbo",
+            "title": "Whisper Model",
+            "type": "string"
+          }
+        },
+        "title": "AppSettings",
+        "type": "object"
+      },
+      "AudioStreamInfo": {
+        "properties": {
+          "channel_layout": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Layout"
+          },
+          "channels": {
+            "title": "Channels",
+            "type": "integer"
+          },
+          "codec": {
+            "title": "Codec",
+            "type": "string"
+          },
+          "default": {
+            "default": false,
+            "title": "Default",
+            "type": "boolean"
+          },
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "sample_rate": {
+            "title": "Sample Rate",
+            "type": "integer"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "index",
+          "codec",
+          "channels",
+          "sample_rate"
+        ],
+        "title": "AudioStreamInfo",
+        "type": "object"
+      },
+      "Body_check_mic_mic_check_post": {
+        "properties": {
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "description": "Запись микрофона: тишина, потом фраза вслух (wav из браузера или любой звук, который понимает ffmpeg)",
+            "title": "File",
+            "type": "string"
+          },
+          "save": {
+            "default": true,
+            "description": "Записать результат в профиль «Мой микрофон»",
+            "title": "Save",
+            "type": "boolean"
+          },
+          "silence_s": {
+            "anyOf": [
+              {
+                "maximum": 30.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Сколько секунд от начала записи человек молчал (в мастере 2). Не указан — движок ищет тишину сам",
+            "title": "Silence S"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_check_mic_mic_check_post",
+        "type": "object"
+      },
+      "Body_measure_latency_mic_latency_post": {
+        "properties": {
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "description": "Запись микрофона, на которую попал сигнал из динамика",
+            "title": "File",
+            "type": "string"
+          },
+          "play_offset_s": {
+            "default": 0.0,
+            "description": "На какой секунде записи запустили проигрывание сигнала",
+            "maximum": 30.0,
+            "minimum": 0.0,
+            "title": "Play Offset S",
+            "type": "number"
+          },
+          "save": {
+            "default": true,
+            "description": "Записать задержку в профиль и в настройки записи (latency_ms)",
+            "title": "Save",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_measure_latency_mic_latency_post",
+        "type": "object"
+      },
+      "Body_upload_take_projects__pid__scenes__scid__takes_post": {
+        "properties": {
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "description": "WAV/любой звук, который понимает ffmpeg",
+            "title": "File",
+            "type": "string"
+          },
+          "line_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Id"
+          },
+          "preroll": {
+            "default": 0.0,
+            "maximum": 600.0,
+            "minimum": 0.0,
+            "title": "Preroll",
+            "type": "number"
+          },
+          "source": {
+            "default": "mic",
+            "description": "mic — запись с микрофона под видео; file — дубль загружен файлом (привязки ко времени нет)",
+            "enum": [
+              "mic",
+              "file"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "start_rel": {
+            "default": 0.0,
+            "maximum": 10000000.0,
+            "minimum": 0.0,
+            "title": "Start Rel",
+            "type": "number"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_take_projects__pid__scenes__scid__takes_post",
+        "type": "object"
+      },
+      "Capabilities": {
+        "description": "Что движок умеет прямо сейчас. Лёгкий движок из установщика — без нейросетей: ml=false.",
+        "properties": {
+          "asr": {
+            "title": "Asr",
+            "type": "boolean"
+          },
+          "diarization": {
+            "title": "Diarization",
+            "type": "boolean"
+          },
+          "gigaam": {
+            "default": false,
+            "title": "Gigaam",
+            "type": "boolean"
+          },
+          "gigaam_download_mb": {
+            "default": 230,
+            "title": "Gigaam Download Mb",
+            "type": "integer"
+          },
+          "gigaam_downloaded": {
+            "default": false,
+            "title": "Gigaam Downloaded",
+            "type": "boolean"
+          },
+          "ml": {
+            "title": "Ml",
+            "type": "boolean"
+          },
+          "separation": {
+            "title": "Separation",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ml",
+          "asr",
+          "separation",
+          "diarization"
+        ],
+        "title": "Capabilities",
+        "type": "object"
+      },
+      "Chapter": {
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "number"
+          },
+          "start": {
+            "title": "Start",
+            "type": "number"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "Chapter",
+        "type": "object"
+      },
+      "CheckResult": {
+        "properties": {
+          "key_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Key Message"
+          },
+          "key_status": {
+            "default": "unknown",
+            "enum": [
+              "unknown",
+              "ok",
+              "invalid"
+            ],
+            "title": "Key Status",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok",
+          "message"
+        ],
+        "title": "CheckResult",
+        "type": "object"
+      },
+      "DirectorCommandResult": {
+        "description": "POST /llm/director с text: что сделали по просьбе. Применять ничего не нужно — mix уже готов, его можно\nотправить в PATCH сцены как есть.",
+        "properties": {
+          "ai_fallback": {
+            "default": false,
+            "title": "Ai Fallback",
+            "type": "boolean"
+          },
+          "ai_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Model"
+          },
+          "mix": {
+            "$ref": "#/components/schemas/MixSettings"
+          },
+          "patches": {
+            "items": {
+              "$ref": "#/components/schemas/MixPatch"
+            },
+            "title": "Patches",
+            "type": "array"
+          }
+        },
+        "required": [
+          "patches",
+          "mix"
+        ],
+        "title": "DirectorCommandResult",
+        "type": "object"
+      },
+      "DirectorReport": {
+        "description": "Замеры дубля словами и числами (llm.director.take_report).",
+        "properties": {
+          "fit_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fit Confidence"
+          },
+          "fit_unsure": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fit Unsure"
+          },
+          "length": {
+            "enum": [
+              "ok",
+              "too_long",
+              "too_short"
+            ],
+            "title": "Length",
+            "type": "string"
+          },
+          "length_level": {
+            "enum": [
+              "ok",
+              "noticeable",
+              "big"
+            ],
+            "title": "Length Level",
+            "type": "string"
+          },
+          "line_id": {
+            "title": "Line Id",
+            "type": "string"
+          },
+          "lips_checked": {
+            "default": true,
+            "title": "Lips Checked",
+            "type": "boolean"
+          },
+          "loudness": {
+            "enum": [
+              "ok",
+              "clipping",
+              "too_quiet"
+            ],
+            "title": "Loudness",
+            "type": "string"
+          },
+          "loudness_lufs": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Loudness Lufs"
+          },
+          "missing_words": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing Words",
+            "type": "array"
+          },
+          "offset_ms": {
+            "title": "Offset Ms",
+            "type": "number"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "peak_db": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Peak Db"
+          },
+          "problems": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Problems",
+            "type": "array"
+          },
+          "source": {
+            "default": "mic",
+            "enum": [
+              "mic",
+              "file"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "stretch": {
+            "title": "Stretch",
+            "type": "number"
+          },
+          "take_id": {
+            "title": "Take Id",
+            "type": "string"
+          },
+          "text_match": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ok",
+                  "partial",
+                  "mismatch",
+                  "silent"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text Match"
+          },
+          "text_ratio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text Ratio"
+          },
+          "timing": {
+            "enum": [
+              "ok",
+              "late",
+              "early"
+            ],
+            "title": "Timing",
+            "type": "string"
+          },
+          "timing_level": {
+            "enum": [
+              "ok",
+              "noticeable",
+              "big"
+            ],
+            "title": "Timing Level",
+            "type": "string"
+          }
+        },
+        "required": [
+          "line_id",
+          "take_id",
+          "offset_ms",
+          "timing",
+          "timing_level",
+          "stretch",
+          "length",
+          "length_level",
+          "loudness",
+          "ok"
+        ],
+        "title": "DirectorReport",
+        "type": "object"
+      },
+      "DirectorTakeResult": {
+        "description": "POST /llm/director с take_id: разбор дубля.",
+        "properties": {
+          "ai_fallback": {
+            "default": false,
+            "title": "Ai Fallback",
+            "type": "boolean"
+          },
+          "ai_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Model"
+          },
+          "feedback": {
+            "title": "Feedback",
+            "type": "string"
+          },
+          "report": {
+            "$ref": "#/components/schemas/DirectorReport"
+          }
+        },
+        "required": [
+          "report",
+          "feedback"
+        ],
+        "title": "DirectorTakeResult",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "debug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Debug"
+          },
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          }
+        },
+        "required": [
+          "detail"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "FitLengthResult": {
+        "properties": {
+          "ai_fallback": {
+            "default": false,
+            "title": "Ai Fallback",
+            "type": "boolean"
+          },
+          "ai_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Model"
+          },
+          "variants": {
+            "items": {
+              "$ref": "#/components/schemas/LineVariants"
+            },
+            "title": "Variants",
+            "type": "array"
+          }
+        },
+        "required": [
+          "variants"
+        ],
+        "title": "FitLengthResult",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "Health": {
+        "properties": {
+          "capabilities": {
+            "$ref": "#/components/schemas/Capabilities"
+          },
+          "device": {
+            "title": "Device",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok",
+          "version",
+          "device",
+          "capabilities"
+        ],
+        "title": "Health",
+        "type": "object"
+      },
+      "Job": {
+        "properties": {
+          "created": {
+            "format": "date-time",
+            "title": "Created",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "error_debug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Debug"
+          },
+          "eta_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eta S"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "progress": {
+            "default": 0.0,
+            "title": "Progress",
+            "type": "number"
+          },
+          "project_id": {
+            "title": "Project Id",
+            "type": "string"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JobResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scene_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scene Id"
+          },
+          "state": {
+            "$ref": "#/components/schemas/JobState",
+            "default": "queued"
+          },
+          "steps": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/JobStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "project_id"
+        ],
+        "title": "Job",
+        "type": "object"
+      },
+      "JobAccepted": {
+        "description": "Тело ответа 202: работа запущена, следите за задачей.",
+        "properties": {
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "state": {
+            "const": "preparing",
+            "default": "preparing",
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id"
+        ],
+        "title": "JobAccepted",
+        "type": "object"
+      },
+      "JobResult": {
+        "description": "Итог задачи, если она что-то записала на диск (render, render_project, preview, proxy).",
+        "properties": {
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "title": "JobResult",
+        "type": "object"
+      },
+      "JobState": {
+        "enum": [
+          "queued",
+          "running",
+          "done",
+          "failed",
+          "cancelled"
+        ],
+        "title": "JobState",
+        "type": "string"
+      },
+      "JobStep": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "progress": {
+            "default": 0.0,
+            "title": "Progress",
+            "type": "number"
+          },
+          "state": {
+            "$ref": "#/components/schemas/JobState",
+            "default": "queued"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "title"
+        ],
+        "title": "JobStep",
+        "type": "object"
+      },
+      "KeyBody": {
+        "properties": {
+          "key": {
+            "format": "password",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Key",
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "key"
+        ],
+        "title": "KeyBody",
+        "type": "object"
+      },
+      "KeyResult": {
+        "description": "Итог PUT /settings/llm/{id}/key: ключ сохранён и проверен.",
+        "properties": {
+          "key_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Key Message"
+          },
+          "key_status": {
+            "enum": [
+              "unknown",
+              "ok",
+              "invalid"
+            ],
+            "title": "Key Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key_status"
+        ],
+        "title": "KeyResult",
+        "type": "object"
+      },
+      "LLMRequest": {
+        "properties": {
+          "line_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Ids"
+          },
+          "n": {
+            "default": 3,
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "N",
+            "type": "integer"
+          },
+          "project_id": {
+            "title": "Project Id",
+            "type": "string"
+          },
+          "scene_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scene Id"
+          },
+          "take_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Take Id"
+          },
+          "target_lang": {
+            "default": "ru",
+            "maxLength": 16,
+            "title": "Target Lang",
+            "type": "string"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          }
+        },
+        "required": [
+          "project_id"
+        ],
+        "title": "LLMRequest",
+        "type": "object"
+      },
+      "LLMSettings": {
+        "properties": {
+          "providers": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ProviderConfig"
+            },
+            "title": "Providers",
+            "type": "array"
+          },
+          "routing": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "default": {},
+            "propertyNames": {
+              "$ref": "#/components/schemas/LLMTask"
+            },
+            "title": "Routing",
+            "type": "object"
+          },
+          "tasks": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/TaskRoute"
+                },
+                "propertyNames": {
+                  "$ref": "#/components/schemas/LLMTask"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tasks"
+          }
+        },
+        "title": "LLMSettings",
+        "type": "object"
+      },
+      "LLMTask": {
+        "enum": [
+          "translate",
+          "fit_length",
+          "name_speakers",
+          "director"
+        ],
+        "title": "LLMTask",
+        "type": "string"
+      },
+      "LatencyResult": {
+        "properties": {
+          "confidence": {
+            "default": 0.0,
+            "title": "Confidence",
+            "type": "number"
+          },
+          "latency_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency Ms"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "ok": {
+            "default": false,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "saved": {
+            "default": false,
+            "title": "Saved",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "LatencyResult",
+        "type": "object"
+      },
+      "LatencySignal": {
+        "description": "Какой сигнал играть для замера задержки. Сам файл — GET /mic/latency_signal.wav (тот же сигнал, детерминированный).",
+        "properties": {
+          "beep_count": {
+            "title": "Beep Count",
+            "type": "integer"
+          },
+          "beep_s": {
+            "title": "Beep S",
+            "type": "number"
+          },
+          "beep_starts_s": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Beep Starts S",
+            "type": "array"
+          },
+          "duration_s": {
+            "title": "Duration S",
+            "type": "number"
+          },
+          "freq_from_hz": {
+            "title": "Freq From Hz",
+            "type": "number"
+          },
+          "freq_to_hz": {
+            "title": "Freq To Hz",
+            "type": "number"
+          },
+          "how_to": {
+            "title": "How To",
+            "type": "string"
+          },
+          "min_record_s": {
+            "title": "Min Record S",
+            "type": "number"
+          },
+          "sample_rate": {
+            "title": "Sample Rate",
+            "type": "integer"
+          },
+          "wav_url": {
+            "title": "Wav Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sample_rate",
+          "duration_s",
+          "beep_count",
+          "beep_starts_s",
+          "beep_s",
+          "freq_from_hz",
+          "freq_to_hz",
+          "min_record_s",
+          "wav_url",
+          "how_to"
+        ],
+        "title": "LatencySignal",
+        "type": "object"
+      },
+      "Line": {
+        "description": "Одна реплика исходного видео.",
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "number"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "overlap": {
+            "default": false,
+            "title": "Overlap",
+            "type": "boolean"
+          },
+          "source": {
+            "default": "whisper",
+            "enum": [
+              "embedded",
+              "whisper"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "speaker_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker Id"
+          },
+          "start": {
+            "title": "Start",
+            "type": "number"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "translation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Translation"
+          },
+          "translation_source": {
+            "anyOf": [
+              {
+                "enum": [
+                  "file",
+                  "llm",
+                  "user"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Translation Source"
+          },
+          "words": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Word"
+            },
+            "title": "Words",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "start",
+          "end",
+          "text"
+        ],
+        "title": "Line",
+        "type": "object"
+      },
+      "LineSpeakerPatch": {
+        "description": "Сменить персонажа у реплики: speaker_id существующего или new_speaker_name — завести нового.",
+        "properties": {
+          "new_speaker_name": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Speaker Name"
+          },
+          "speaker_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker Id"
+          }
+        },
+        "title": "LineSpeakerPatch",
+        "type": "object"
+      },
+      "LineTextPatch": {
+        "properties": {
+          "line_id": {
+            "title": "Line Id",
+            "type": "string"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "enum": [
+                  "file",
+                  "llm",
+                  "user"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "text": {
+            "maxLength": 5000,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "line_id",
+          "text"
+        ],
+        "title": "LineTextPatch",
+        "type": "object"
+      },
+      "LineVariants": {
+        "properties": {
+          "line_id": {
+            "title": "Line Id",
+            "type": "string"
+          },
+          "texts": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Texts",
+            "type": "array"
+          }
+        },
+        "required": [
+          "line_id",
+          "texts"
+        ],
+        "title": "LineVariants",
+        "type": "object"
+      },
+      "LinesMerge": {
+        "properties": {
+          "line_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 6,
+            "minItems": 2,
+            "title": "Line Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "line_ids"
+        ],
+        "title": "LinesMerge",
+        "type": "object"
+      },
+      "LoginResult": {
+        "description": "Итог POST /settings/llm/{id}/login: терминал с входом открыт (после входа статус перепроверь GET /settings?refresh=true).",
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok",
+          "message"
+        ],
+        "title": "LoginResult",
+        "type": "object"
+      },
+      "MediaInfo": {
+        "properties": {
+          "audio_streams": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AudioStreamInfo"
+            },
+            "title": "Audio Streams",
+            "type": "array"
+          },
+          "chapters": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Chapter"
+            },
+            "title": "Chapters",
+            "type": "array"
+          },
+          "container": {
+            "title": "Container",
+            "type": "string"
+          },
+          "duration": {
+            "title": "Duration",
+            "type": "number"
+          },
+          "fps": {
+            "title": "Fps",
+            "type": "number"
+          },
+          "height": {
+            "title": "Height",
+            "type": "integer"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "size_bytes": {
+            "default": 0,
+            "title": "Size Bytes",
+            "type": "integer"
+          },
+          "subtitle_streams": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/SubtitleStreamInfo"
+            },
+            "title": "Subtitle Streams",
+            "type": "array"
+          },
+          "video_codec": {
+            "title": "Video Codec",
+            "type": "string"
+          },
+          "width": {
+            "title": "Width",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "duration",
+          "container",
+          "width",
+          "height",
+          "fps",
+          "video_codec"
+        ],
+        "title": "MediaInfo",
+        "type": "object"
+      },
+      "MergedLinesProject": {
+        "description": "Ответ склейки реплик: проект, merge_id для отмены и сколько дублей перешло к склеенной реплике.",
+        "properties": {
+          "analysis": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Analysis"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "analysis_state": {
+            "default": "none",
+            "enum": [
+              "none",
+              "running",
+              "interrupted",
+              "done"
+            ],
+            "title": "Analysis State",
+            "type": "string"
+          },
+          "created": {
+            "format": "date-time",
+            "title": "Created",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "media": {
+            "$ref": "#/components/schemas/MediaInfo"
+          },
+          "merge_id": {
+            "title": "Merge Id",
+            "type": "string"
+          },
+          "moved_takes": {
+            "default": 0,
+            "title": "Moved Takes",
+            "type": "integer"
+          },
+          "scenes": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Scene"
+            },
+            "title": "Scenes",
+            "type": "array"
+          },
+          "source_path": {
+            "title": "Source Path",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated": {
+            "format": "date-time",
+            "title": "Updated",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "source_path",
+          "media",
+          "merge_id"
+        ],
+        "title": "MergedLinesProject",
+        "type": "object"
+      },
+      "MergedProject": {
+        "description": "Ответ слияния голосов: весь проект и merge_id для отмены.",
+        "properties": {
+          "analysis": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Analysis"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "analysis_state": {
+            "default": "none",
+            "enum": [
+              "none",
+              "running",
+              "interrupted",
+              "done"
+            ],
+            "title": "Analysis State",
+            "type": "string"
+          },
+          "created": {
+            "format": "date-time",
+            "title": "Created",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "media": {
+            "$ref": "#/components/schemas/MediaInfo"
+          },
+          "merge_id": {
+            "title": "Merge Id",
+            "type": "string"
+          },
+          "scenes": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Scene"
+            },
+            "title": "Scenes",
+            "type": "array"
+          },
+          "source_path": {
+            "title": "Source Path",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated": {
+            "format": "date-time",
+            "title": "Updated",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "source_path",
+          "media",
+          "merge_id"
+        ],
+        "title": "MergedProject",
+        "type": "object"
+      },
+      "MicCheckResult": {
+        "description": "Итог проверки микрофона по записи «тишина, потом фраза». Уровни — дБ от полной шкалы (0 — потолок, −60 — тишина).",
+        "properties": {
+          "advice": {
+            "title": "Advice",
+            "type": "string"
+          },
+          "clipping": {
+            "default": false,
+            "title": "Clipping",
+            "type": "boolean"
+          },
+          "noise_floor_db": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Noise Floor Db"
+          },
+          "peak_db": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Peak Db"
+          },
+          "saved": {
+            "default": false,
+            "title": "Saved",
+            "type": "boolean"
+          },
+          "snr_db": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snr Db"
+          },
+          "speech_db": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speech Db"
+          },
+          "speech_found": {
+            "default": true,
+            "title": "Speech Found",
+            "type": "boolean"
+          },
+          "verdict": {
+            "enum": [
+              "good",
+              "quiet",
+              "loud",
+              "noisy",
+              "silent"
+            ],
+            "title": "Verdict",
+            "type": "string"
+          }
+        },
+        "required": [
+          "verdict",
+          "advice"
+        ],
+        "title": "MicCheckResult",
+        "type": "object"
+      },
+      "MicProfile": {
+        "description": "Профиль «Мой микрофон»: итог проверки микрофона (POST /mic/check, POST /mic/latency). Поля, которых ещё не\nмерили, — None. Меняется только через /mic/*; из тела PUT /settings движок его не берёт.",
+        "properties": {
+          "checked_at": {
+            "format": "date-time",
+            "title": "Checked At",
+            "type": "string"
+          },
+          "device": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device"
+          },
+          "latency_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency Ms"
+          },
+          "noise_floor_db": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Noise Floor Db"
+          },
+          "peak_db": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Peak Db"
+          },
+          "speech_db": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speech Db"
+          }
+        },
+        "title": "MicProfile",
+        "type": "object"
+      },
+      "MixMode": {
+        "enum": [
+          "dub",
+          "voiceover"
+        ],
+        "title": "MixMode",
+        "type": "string"
+      },
+      "MixPatch": {
+        "description": "Одно изменение настроек сведения. value — всегда абсолютное (относительные просьбы уже пересчитаны).",
+        "properties": {
+          "field": {
+            "enum": [
+              "gain_db",
+              "room",
+              "voice_fx",
+              "mute",
+              "duck_background",
+              "target_lufs",
+              "mode"
+            ],
+            "title": "Field",
+            "type": "string"
+          },
+          "note": {
+            "default": "",
+            "title": "Note",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "target",
+          "field",
+          "value",
+          "note"
+        ],
+        "title": "MixPatch",
+        "type": "object"
+      },
+      "MixSettings": {
+        "properties": {
+          "autopilot": {
+            "default": true,
+            "title": "Autopilot",
+            "type": "boolean"
+          },
+          "background": {
+            "$ref": "#/components/schemas/TrackSettings",
+            "default": {
+              "boost_capped": false,
+              "gain_db": 0.0,
+              "mute": false,
+              "room": "auto",
+              "solo": false,
+              "voice_fx": "none"
+            }
+          },
+          "denoise": {
+            "default": true,
+            "title": "Denoise",
+            "type": "boolean"
+          },
+          "duck_background": {
+            "default": true,
+            "title": "Duck Background",
+            "type": "boolean"
+          },
+          "keep_breaths": {
+            "default": true,
+            "title": "Keep Breaths",
+            "type": "boolean"
+          },
+          "loudness_target": {
+            "default": "online",
+            "enum": [
+              "online",
+              "film"
+            ],
+            "title": "Loudness Target",
+            "type": "string"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/MixMode",
+            "default": "dub"
+          },
+          "original_voices_db": {
+            "default": -14.0,
+            "title": "Original Voices Db",
+            "type": "number"
+          },
+          "target_lufs": {
+            "default": -14.0,
+            "title": "Target Lufs",
+            "type": "number"
+          },
+          "tracks": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TrackSettings"
+            },
+            "default": {},
+            "title": "Tracks",
+            "type": "object"
+          },
+          "true_peak_db": {
+            "default": -1.0,
+            "title": "True Peak Db",
+            "type": "number"
+          }
+        },
+        "title": "MixSettings",
+        "type": "object"
+      },
+      "NameSpeakersResult": {
+        "properties": {
+          "ai_fallback": {
+            "default": false,
+            "title": "Ai Fallback",
+            "type": "boolean"
+          },
+          "ai_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Model"
+          },
+          "names": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Names",
+            "type": "object"
+          }
+        },
+        "required": [
+          "names"
+        ],
+        "title": "NameSpeakersResult",
+        "type": "object"
+      },
+      "Ok": {
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "title": "Ok",
+        "type": "object"
+      },
+      "ProbeRequest": {
+        "description": "Что проверить: файл на диске (path) или ссылку (url) — ровно одно из двух.",
+        "properties": {
+          "path": {
+            "anyOf": [
+              {
+                "maxLength": 4096,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "title": "ProbeRequest",
+        "type": "object"
+      },
+      "Project": {
+        "properties": {
+          "analysis": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Analysis"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "analysis_state": {
+            "default": "none",
+            "enum": [
+              "none",
+              "running",
+              "interrupted",
+              "done"
+            ],
+            "title": "Analysis State",
+            "type": "string"
+          },
+          "created": {
+            "format": "date-time",
+            "title": "Created",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "media": {
+            "$ref": "#/components/schemas/MediaInfo"
+          },
+          "scenes": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Scene"
+            },
+            "title": "Scenes",
+            "type": "array"
+          },
+          "source_path": {
+            "title": "Source Path",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated": {
+            "format": "date-time",
+            "title": "Updated",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "source_path",
+          "media"
+        ],
+        "title": "Project",
+        "type": "object"
+      },
+      "ProjectCreate": {
+        "properties": {
+          "audio_stream_index": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audio Stream Index"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "maxLength": 8,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "maxLength": 4096,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "title": "ProjectCreate",
+        "type": "object"
+      },
+      "ProjectRename": {
+        "properties": {
+          "title": {
+            "maxLength": 300,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "title": "ProjectRename",
+        "type": "object"
+      },
+      "ProjectSummary": {
+        "properties": {
+          "analysis_state": {
+            "default": "none",
+            "enum": [
+              "none",
+              "running",
+              "interrupted",
+              "done"
+            ],
+            "title": "Analysis State",
+            "type": "string"
+          },
+          "created": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created"
+          },
+          "duration": {
+            "title": "Duration",
+            "type": "number"
+          },
+          "has_analysis": {
+            "title": "Has Analysis",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "scene_count": {
+            "title": "Scene Count",
+            "type": "integer"
+          },
+          "thumbnail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thumbnail"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated": {
+            "format": "date-time",
+            "title": "Updated",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "duration",
+          "scene_count",
+          "has_analysis",
+          "updated"
+        ],
+        "title": "ProjectSummary",
+        "type": "object"
+      },
+      "ProviderConfig": {
+        "properties": {
+          "base_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Url"
+          },
+          "can_answer": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Can Answer"
+          },
+          "enabled": {
+            "default": true,
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "install_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Install Url"
+          },
+          "key_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Key Message"
+          },
+          "key_set": {
+            "default": false,
+            "title": "Key Set",
+            "type": "boolean"
+          },
+          "key_status": {
+            "default": "unknown",
+            "enum": [
+              "unknown",
+              "ok",
+              "invalid"
+            ],
+            "title": "Key Status",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ProviderKind"
+          },
+          "login_supported": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Login Supported"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ok",
+                  "off",
+                  "not_installed",
+                  "not_logged_in",
+                  "no_key",
+                  "invalid_key",
+                  "error"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          },
+          "state_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State Message"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "model"
+        ],
+        "title": "ProviderConfig",
+        "type": "object"
+      },
+      "ProviderKind": {
+        "enum": [
+          "claude_cli",
+          "anthropic",
+          "deepseek",
+          "gemini",
+          "openai_compat",
+          "codex_cli"
+        ],
+        "title": "ProviderKind",
+        "type": "string"
+      },
+      "RenderAspect": {
+        "enum": [
+          "original",
+          "16:9",
+          "9:16",
+          "1:1"
+        ],
+        "title": "RenderAspect",
+        "type": "string"
+      },
+      "RenderFit": {
+        "enum": [
+          "blur",
+          "crop"
+        ],
+        "title": "RenderFit",
+        "type": "string"
+      },
+      "RenderProjectRequest": {
+        "description": "Склейка сцен в один ролик. Порядок scene_ids = порядок в ролике.",
+        "properties": {
+          "scene_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Scene Ids",
+            "type": "array"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/RenderSettings"
+          }
+        },
+        "required": [
+          "scene_ids",
+          "settings"
+        ],
+        "title": "RenderProjectRequest",
+        "type": "object"
+      },
+      "RenderSettings": {
+        "properties": {
+          "aspect": {
+            "$ref": "#/components/schemas/RenderAspect",
+            "default": "original"
+          },
+          "export_stems": {
+            "default": false,
+            "title": "Export Stems",
+            "type": "boolean"
+          },
+          "fit": {
+            "$ref": "#/components/schemas/RenderFit",
+            "default": "blur"
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": 1080,
+            "title": "Height"
+          },
+          "output_path": {
+            "title": "Output Path",
+            "type": "string"
+          },
+          "overwrite": {
+            "default": false,
+            "title": "Overwrite",
+            "type": "boolean"
+          },
+          "subtitle_text": {
+            "$ref": "#/components/schemas/SubtitleText",
+            "default": "dub"
+          },
+          "subtitles": {
+            "$ref": "#/components/schemas/SubtitleMode",
+            "default": "none"
+          },
+          "target_lufs": {
+            "default": -14.0,
+            "title": "Target Lufs",
+            "type": "number"
+          }
+        },
+        "required": [
+          "output_path"
+        ],
+        "title": "RenderSettings",
+        "type": "object"
+      },
+      "Scene": {
+        "properties": {
+          "created": {
+            "format": "date-time",
+            "title": "Created",
+            "type": "string"
+          },
+          "dubbed_speakers": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Dubbed Speakers",
+            "type": "array"
+          },
+          "end": {
+            "title": "End",
+            "type": "number"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "lines": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/SceneLine"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "mix": {
+            "$ref": "#/components/schemas/MixSettings",
+            "default": {
+              "autopilot": true,
+              "background": {
+                "boost_capped": false,
+                "gain_db": 0.0,
+                "mute": false,
+                "room": "auto",
+                "solo": false,
+                "voice_fx": "none"
+              },
+              "denoise": true,
+              "duck_background": true,
+              "keep_breaths": true,
+              "loudness_target": "online",
+              "mode": "dub",
+              "original_voices_db": -14.0,
+              "target_lufs": -14.0,
+              "tracks": {},
+              "true_peak_db": -1.0
+            }
+          },
+          "prepare_state": {
+            "default": "interrupted",
+            "enum": [
+              "running",
+              "interrupted",
+              "ready"
+            ],
+            "title": "Prepare State",
+            "type": "string"
+          },
+          "start": {
+            "title": "Start",
+            "type": "number"
+          },
+          "stems_ready": {
+            "default": false,
+            "title": "Stems Ready",
+            "type": "boolean"
+          },
+          "takes": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Take"
+            },
+            "title": "Takes",
+            "type": "array"
+          },
+          "text_mode": {
+            "$ref": "#/components/schemas/SceneTextMode",
+            "default": "as_is"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "start",
+          "end"
+        ],
+        "title": "Scene",
+        "type": "object"
+      },
+      "SceneCreate": {
+        "properties": {
+          "end": {
+            "maximum": 10000000.0,
+            "minimum": 0.0,
+            "title": "End",
+            "type": "number"
+          },
+          "start": {
+            "maximum": 10000000.0,
+            "minimum": 0.0,
+            "title": "Start",
+            "type": "number"
+          },
+          "title": {
+            "default": "",
+            "maxLength": 200,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "SceneCreate",
+        "type": "object"
+      },
+      "SceneLine": {
+        "description": "Реплика внутри сцены — то, что озвучивает человек.",
+        "properties": {
+          "end_rel": {
+            "title": "End Rel",
+            "type": "number"
+          },
+          "line_id": {
+            "title": "Line Id",
+            "type": "string"
+          },
+          "original": {
+            "title": "Original",
+            "type": "string"
+          },
+          "speaker_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker Id"
+          },
+          "start_rel": {
+            "title": "Start Rel",
+            "type": "number"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "translation_source": {
+            "anyOf": [
+              {
+                "enum": [
+                  "file",
+                  "llm",
+                  "user"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Translation Source"
+          }
+        },
+        "required": [
+          "line_id",
+          "speaker_id",
+          "start_rel",
+          "end_rel",
+          "original",
+          "text"
+        ],
+        "title": "SceneLine",
+        "type": "object"
+      },
+      "ScenePatch": {
+        "properties": {
+          "dubbed_speakers": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dubbed Speakers"
+          },
+          "lines": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/LineTextPatch"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lines"
+          },
+          "mix": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MixSettings"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "text_mode": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SceneTextMode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "title": "ScenePatch",
+        "type": "object"
+      },
+      "SceneTextMode": {
+        "enum": [
+          "as_is",
+          "custom"
+        ],
+        "title": "SceneTextMode",
+        "type": "string"
+      },
+      "SnapRequest": {
+        "properties": {
+          "a": {
+            "maximum": 10000000.0,
+            "minimum": 0.0,
+            "title": "A",
+            "type": "number"
+          },
+          "b": {
+            "anyOf": [
+              {
+                "maximum": 10000000.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "B"
+          },
+          "mode": {
+            "default": "free",
+            "enum": [
+              "free",
+              "dialogue",
+              "shot"
+            ],
+            "title": "Mode",
+            "type": "string"
+          }
+        },
+        "required": [
+          "a"
+        ],
+        "title": "SnapRequest",
+        "type": "object"
+      },
+      "SnapResult": {
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "number"
+          },
+          "start": {
+            "title": "Start",
+            "type": "number"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "SnapResult",
+        "type": "object"
+      },
+      "Speaker": {
+        "properties": {
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "line_count": {
+            "default": 0,
+            "title": "Line Count",
+            "type": "integer"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "total_speech": {
+            "default": 0.0,
+            "title": "Total Speech",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "color"
+        ],
+        "title": "Speaker",
+        "type": "object"
+      },
+      "SpeakerMerge": {
+        "properties": {
+          "a": {
+            "title": "A",
+            "type": "string"
+          },
+          "b": {
+            "title": "B",
+            "type": "string"
+          }
+        },
+        "required": [
+          "a",
+          "b"
+        ],
+        "title": "SpeakerMerge",
+        "type": "object"
+      },
+      "SpeakerRename": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "title": "SpeakerRename",
+        "type": "object"
+      },
+      "SubtitleMode": {
+        "enum": [
+          "none",
+          "burn",
+          "file"
+        ],
+        "title": "SubtitleMode",
+        "type": "string"
+      },
+      "SubtitleStreamInfo": {
+        "properties": {
+          "codec": {
+            "title": "Codec",
+            "type": "string"
+          },
+          "default": {
+            "default": false,
+            "title": "Default",
+            "type": "boolean"
+          },
+          "forced": {
+            "default": false,
+            "title": "Forced",
+            "type": "boolean"
+          },
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          },
+          "is_text": {
+            "title": "Is Text",
+            "type": "boolean"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "index",
+          "codec",
+          "is_text"
+        ],
+        "title": "SubtitleStreamInfo",
+        "type": "object"
+      },
+      "SubtitleText": {
+        "enum": [
+          "dub",
+          "original"
+        ],
+        "title": "SubtitleText",
+        "type": "string"
+      },
+      "Take": {
+        "properties": {
+          "chosen_by_user": {
+            "default": false,
+            "title": "Chosen By User",
+            "type": "boolean"
+          },
+          "clip_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clip Pct"
+          },
+          "complete": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Complete"
+          },
+          "created": {
+            "format": "date-time",
+            "title": "Created",
+            "type": "string"
+          },
+          "duration": {
+            "title": "Duration",
+            "type": "number"
+          },
+          "empty": {
+            "default": false,
+            "title": "Empty",
+            "type": "boolean"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "fit_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fit Confidence"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "line_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Id"
+          },
+          "loudness_lufs": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Loudness Lufs"
+          },
+          "noise_floor_db": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Noise Floor Db"
+          },
+          "offset_ms": {
+            "default": 0.0,
+            "title": "Offset Ms",
+            "type": "number"
+          },
+          "peak_db": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Peak Db"
+          },
+          "preroll": {
+            "title": "Preroll",
+            "type": "number"
+          },
+          "recognized_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recognized Text"
+          },
+          "selected": {
+            "default": false,
+            "title": "Selected",
+            "type": "boolean"
+          },
+          "snr_db": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snr Db"
+          },
+          "source": {
+            "default": "mic",
+            "enum": [
+              "mic",
+              "file"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "speaker_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker Id"
+          },
+          "start_rel": {
+            "title": "Start Rel",
+            "type": "number"
+          },
+          "stretch": {
+            "default": 1.0,
+            "title": "Stretch",
+            "type": "number"
+          },
+          "tail_cut_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tail Cut S"
+          },
+          "tail_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tail Text"
+          },
+          "tail_trimmed": {
+            "default": false,
+            "title": "Tail Trimmed",
+            "type": "boolean"
+          },
+          "text_match": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text Match"
+          }
+        },
+        "required": [
+          "id",
+          "line_id",
+          "speaker_id",
+          "file",
+          "duration",
+          "preroll",
+          "start_rel"
+        ],
+        "title": "Take",
+        "type": "object"
+      },
+      "TakePatch": {
+        "properties": {
+          "offset_ms": {
+            "anyOf": [
+              {
+                "maximum": 10000.0,
+                "minimum": -10000.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offset Ms"
+          },
+          "selected": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected"
+          },
+          "stretch": {
+            "anyOf": [
+              {
+                "maximum": 2.0,
+                "minimum": 0.5,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stretch"
+          }
+        },
+        "title": "TakePatch",
+        "type": "object"
+      },
+      "TaskRoute": {
+        "description": "Кто на самом деле ответит на задачу (только в ответах GET/PUT /settings, в settings.json не пишется).",
+        "properties": {
+          "answers": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answers"
+          },
+          "answers_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answers Title"
+          },
+          "assigned": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigned"
+          },
+          "fallback": {
+            "default": false,
+            "title": "Fallback",
+            "type": "boolean"
+          },
+          "fallback_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fallback Id"
+          },
+          "last_used": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used"
+          },
+          "last_used_fallback": {
+            "default": false,
+            "title": "Last Used Fallback",
+            "type": "boolean"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          }
+        },
+        "title": "TaskRoute",
+        "type": "object"
+      },
+      "TrackSettings": {
+        "description": "Настройки дорожки персонажа (или фона) в сведении.",
+        "properties": {
+          "boost_capped": {
+            "default": false,
+            "title": "Boost Capped",
+            "type": "boolean"
+          },
+          "gain_db": {
+            "default": 0.0,
+            "title": "Gain Db",
+            "type": "number"
+          },
+          "mute": {
+            "default": false,
+            "title": "Mute",
+            "type": "boolean"
+          },
+          "room": {
+            "default": "auto",
+            "title": "Room",
+            "type": "string"
+          },
+          "solo": {
+            "default": false,
+            "title": "Solo",
+            "type": "boolean"
+          },
+          "voice_fx": {
+            "default": "none",
+            "title": "Voice Fx",
+            "type": "string"
+          }
+        },
+        "title": "TrackSettings",
+        "type": "object"
+      },
+      "TranslateResult": {
+        "properties": {
+          "ai_fallback": {
+            "default": false,
+            "title": "Ai Fallback",
+            "type": "boolean"
+          },
+          "ai_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Model"
+          },
+          "translations": {
+            "items": {
+              "$ref": "#/components/schemas/TranslatedLine"
+            },
+            "title": "Translations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "translations"
+        ],
+        "title": "TranslateResult",
+        "type": "object"
+      },
+      "TranslatedLine": {
+        "properties": {
+          "line_id": {
+            "title": "Line Id",
+            "type": "string"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "enum": [
+                  "file",
+                  "llm",
+                  "user"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "line_id",
+          "text"
+        ],
+        "title": "TranslatedLine",
+        "type": "object"
+      },
+      "UrlProbe": {
+        "description": "Что известно о ролике по ссылке до скачивания. known=False — «узнаем после скачивания» (см. message).",
+        "properties": {
+          "duration": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration"
+          },
+          "has_subtitles": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Has Subtitles"
+          },
+          "known": {
+            "title": "Known",
+            "type": "boolean"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "subtitle_langs": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Subtitle Langs",
+            "type": "array"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "known"
+        ],
+        "title": "UrlProbe",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "Word": {
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "number"
+          },
+          "prob": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prob"
+          },
+          "start": {
+            "title": "Start",
+            "type": "number"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "text"
+        ],
+        "title": "Word",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Дубль — движок",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/files/{pid}/proxy": {
+      "get": {
+        "description": "Лёгкая копия исходника для плеера (kind='proxy'). Нет копии — запускается задача и сразу 202 + X-Job-Id;\nпока она идёт, повторные запросы тоже получают 202 с тем же id. Готово — 200 и сам файл.",
+        "operationId": "get_proxy_files__pid__proxy_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Начать заново после ошибки",
+            "in": "query",
+            "name": "retry",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Начать заново после ошибки",
+              "title": "Retry",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "mp4 540p h264+aac, faststart; Range поддерживается"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobAccepted"
+                }
+              }
+            },
+            "description": "Копия готовится — повторите запрос позже",
+            "headers": {
+              "X-Job-Id": {
+                "description": "Id задачи, которая готовит файл (GET /jobs/{id} или WS /ws/jobs)",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Proxy",
+        "tags": [
+          "files"
+        ]
+      }
+    },
+    "/files/{pid}/source": {
+      "get": {
+        "description": "Исходное видео проекта целиком (лежит там, где его оставил пользователь). Range-запросы — для перемотки в плеере.\nЕсли браузер такой файл не проигрывает (mkv, ac3, hevc), плеер берёт /files/{pid}/proxy.",
+        "operationId": "get_source_files__pid__source_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Source",
+        "tags": [
+          "files"
+        ]
+      }
+    },
+    "/files/{pid}/{path}": {
+      "get": {
+        "description": "Медиа проекта (Range-запросы для видео поддерживает FileResponse). Только внутри папки проекта.",
+        "operationId": "get_file_files__pid___path__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "path",
+            "required": true,
+            "schema": {
+              "title": "Path",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get File",
+        "tags": [
+          "files"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "Жив ли движок. Открытый роут (без токена): по нему UI находит движок. torch грузится один раз.",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "system"
+        ]
+      }
+    },
+    "/jobs": {
+      "get": {
+        "operationId": "list_jobs_jobs_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Job"
+                  },
+                  "title": "Response List Jobs Jobs Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        },
+        "summary": "List Jobs",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/jobs/{job_id}": {
+      "get": {
+        "operationId": "get_job_jobs__job_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Job",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/jobs/{job_id}/cancel": {
+      "post": {
+        "operationId": "cancel_job_jobs__job_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancel Job",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/llm/director": {
+      "post": {
+        "description": "Помощник-режиссёр разбирает дубль (нужен take_id): замеры + 1–2 фразы совета. Работает и без модели — по правилам.\nПросьбы словами («кот громче») — в POST /llm/director_command.",
+        "operationId": "director_llm_director_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LLMRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DirectorTakeResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Director",
+        "tags": [
+          "llm"
+        ]
+      }
+    },
+    "/llm/director_command": {
+      "post": {
+        "description": "Просьба обычными словами → проверенные изменения сведения (каждое с note) и итоговые настройки mix.",
+        "operationId": "director_command_route_llm_director_command_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LLMRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DirectorCommandResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Director Command Route",
+        "tags": [
+          "llm"
+        ]
+      }
+    },
+    "/llm/fit_length": {
+      "post": {
+        "operationId": "fit_length_llm_fit_length_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LLMRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FitLengthResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Fit Length",
+        "tags": [
+          "llm"
+        ]
+      }
+    },
+    "/llm/name_speakers": {
+      "post": {
+        "operationId": "name_speakers_route_llm_name_speakers_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LLMRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NameSpeakersResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Name Speakers Route",
+        "tags": [
+          "llm"
+        ]
+      }
+    },
+    "/llm/translate": {
+      "post": {
+        "description": "Перевести реплики сцены. Перевод человека (translation_source='user') не перетирается и ИИ не отправляется —\nв ответе такая реплика возвращается с её текстом и source='user'. Остальное (в том числе перевод из файла)\nперезаписывается и сразу сохраняется в сцену с translation_source='llm'.\nai_model — кто ответил; ai_fallback — ответила запасная модель.",
+        "operationId": "translate_llm_translate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LLMRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranslateResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Translate",
+        "tags": [
+          "llm"
+        ]
+      }
+    },
+    "/mic/check": {
+      "post": {
+        "description": "Проверка микрофона: уровень шума в тишине, пик и средний уровень речи, перегруз и совет по-русски.\nСоветы: «Всё хорошо…», «Тихо — подойди ближе…», «Громковато — отодвинься…» (и отдельно про перегруз),\n«В комнате шумно…», «Не слышу твой голос…». Профиль («Мой микрофон») обновляется только если речь нашлась.",
+        "operationId": "check_mic_mic_check_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_check_mic_mic_check_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MicCheckResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Check Mic",
+        "tags": [
+          "mic"
+        ]
+      }
+    },
+    "/mic/latency": {
+      "post": {
+        "description": "Замер задержки петлёй: движок находит в записи эталонный сигнал (GET /mic/latency_signal) кросс-корреляцией.\nlatency_ms — на сколько позже сигнал попал в запись, чем его запустили; confidence ≥ 0,5 — результату можно верить\n(ok=true). Не нашёл — ok=false и message с подсказкой (колонки, тишина). При saved=true задержка стала\nAppSettings.latency_ms, и автоподгонка дублей её учитывает.",
+        "operationId": "measure_latency_mic_latency_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_measure_latency_mic_latency_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LatencyResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Measure Latency",
+        "tags": [
+          "mic"
+        ]
+      }
+    },
+    "/mic/latency_signal": {
+      "get": {
+        "description": "Описание сигнала для замера задержки петлёй. Сценарий: открыть микрофон и начать запись → через ≈0,3 с запустить\nпроигрывание GET /mic/latency_signal.wav в динамик (запомнить, на какой секунде записи запустили) → писать не меньше\nmin_record_s → отправить запись в POST /mic/latency с play_offset_s.",
+        "operationId": "latency_signal_info_mic_latency_signal_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LatencySignal"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Latency Signal Info",
+        "tags": [
+          "mic"
+        ]
+      }
+    },
+    "/mic/latency_signal.wav": {
+      "get": {
+        "description": "Сам сигнал: wav 48 кГц, mono, 16 бит, 2 с — полсекунды тишины и три чирика по 80 мс (тон растёт от 1,5 до 3,5 кГц).",
+        "operationId": "latency_signal_wav_mic_latency_signal_wav_get",
+        "responses": {
+          "200": {
+            "content": {
+              "audio/wav": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Latency Signal Wav",
+        "tags": [
+          "mic"
+        ]
+      }
+    },
+    "/mic/profile": {
+      "delete": {
+        "description": "Забыть профиль «Мой микрофон» (задержка записи AppSettings.latency_ms остаётся).",
+        "operationId": "delete_profile_mic_profile_delete",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ok"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Delete Profile",
+        "tags": [
+          "mic"
+        ]
+      },
+      "get": {
+        "description": "Профиль «Мой микрофон»; null — микрофон ещё не проверяли.",
+        "operationId": "get_profile_mic_profile_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MicProfile"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Get Profile Mic Profile Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Get Profile",
+        "tags": [
+          "mic"
+        ]
+      }
+    },
+    "/probe": {
+      "post": {
+        "description": "Что известно до создания проекта. path → MediaInfo (дорожки, субтитры, главы). url → UrlProbe: название,\nдлительность, есть ли субтитры — только метаданные (не дольше 15 с), видео не скачивается. Ссылка не ведёт на\nдоступное видео → 422 с понятным текстом. Нет сети/таймаут → 200, known=false и message «не удалось проверить\nссылку». file://… — то же, что path.",
+        "operationId": "probe_probe_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProbeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MediaInfo"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UrlProbe"
+                    }
+                  ],
+                  "title": "Response Probe Probe Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Probe",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/projects": {
+      "get": {
+        "description": "Сводки проектов. analysis_state: running — разбор идёт (или в очереди); interrupted — результата нет и разбор не\nидёт (закрыли программу, отмена, ошибка): перезапуск — POST /projects/{pid}/analyze; done — has_analysis=true.",
+        "operationId": "list_projects_projects_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectSummary"
+                  },
+                  "title": "Response List Projects Projects Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        },
+        "summary": "List Projects",
+        "tags": [
+          "projects"
+        ]
+      },
+      "post": {
+        "description": "Создать проект и сразу поставить разбор в очередь. Id задачи — в заголовке X-Job-Id.",
+        "operationId": "create_project_projects_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            },
+            "description": "Successful Response",
+            "headers": {
+              "X-Job-Id": {
+                "description": "Id фоновой задачи (следить за ней: GET /jobs/{id} или WS /ws/jobs)",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Project",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/projects/{pid}": {
+      "delete": {
+        "description": "Удалить проект: идущие задачи останавливаются, стираются папка проекта и видео, которое программа сама скачала\nпо ссылке (<данные>/downloads/…). Файл, который пользователь выбрал на своём диске, не трогаем никогда.",
+        "operationId": "delete_project_projects__pid__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ok"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Project",
+        "tags": [
+          "projects"
+        ]
+      },
+      "get": {
+        "operationId": "get_project_projects__pid__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Project",
+        "tags": [
+          "projects"
+        ]
+      },
+      "patch": {
+        "description": "Переименовать проект (только название; папка и файлы остаются на месте).",
+        "operationId": "rename_project_projects__pid__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectRename"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rename Project",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/projects/{pid}/analyze": {
+      "post": {
+        "description": "Разобрать проект заново (после ошибки или когда докачали нейросети). Прежний разбор заменяется, сцены остаются.",
+        "operationId": "reanalyze_project_projects__pid__analyze_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/AnalyzeRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reanalyze Project",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/projects/{pid}/lines/merge": {
+      "post": {
+        "description": "Склеить соседние реплики ОДНОГО персонажа в одну. Ответ — проект, merge_id для отмены, moved_takes.\n400 — реплики не подряд, разных персонажей («сначала смени персонажа у одной из них»), или слишком длинно.\nВ analysis.merged_lines появляется запись «склеенная реплика → merge_id» (для «Разделить»).",
+        "operationId": "merge_lines_projects__pid__lines_merge_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinesMerge"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MergedLinesProject"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Merge Lines",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/projects/{pid}/lines/merges/{merge_id}/undo": {
+      "post": {
+        "description": "Отменить склейку: реплики, их текст, персонаж, дубли и ★ — как были (карта analysis.merged_lines — тоже).",
+        "operationId": "undo_merge_lines_projects__pid__lines_merges__merge_id__undo_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "merge_id",
+            "required": true,
+            "schema": {
+              "title": "Merge Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Undo Merge Lines",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/projects/{pid}/lines/{line_id}/speaker": {
+      "patch": {
+        "description": "Сменить персонажа у реплики (в разборе и во всех сценах, вместе с её дублями). new_speaker_name — новый персонаж.\n409 — идёт разбор или подготовка сцены.",
+        "operationId": "set_line_speaker_projects__pid__lines__line_id__speaker_patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "line_id",
+            "required": true,
+            "schema": {
+              "title": "Line Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LineSpeakerPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Line Speaker",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/projects/{pid}/lines/{line_id}/split": {
+      "post": {
+        "description": "«Разделить обратно» склеенную реплику (ручная склейка или авто-склейка при разборе): отменяется последняя\nсклейка, в которую она вошла (analysis.merged_lines[line_id]); цепочка склеек разбирается по шагу за вызов.\n404 — реплика не склеивалась (или отменять уже нечего); 409 — идёт разбор/подготовка сцены или склейку уже\nнельзя отменить.",
+        "operationId": "split_line_projects__pid__lines__line_id__split_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "line_id",
+            "required": true,
+            "schema": {
+              "title": "Line Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Split Line",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/projects/{pid}/render": {
+      "post": {
+        "description": "Склейка сцен в один ролик (kind='render_project'). Порядок scene_ids = порядок в ролике. Каждая сцена сводится и\nмастерится как обычно, видео склеиваются встык, на стыках звук 80 мс переходом, затем мастеринг всего ролика.\nИтог: job.result.path и job.result.url. Одна сцена тоже работает (то же, что POST …/scenes/{scid}/render).\nФайл с таким именем уже есть и settings.overwrite=false → «<имя> (2).mp4», «(3)» … (итоговый путь — в job.result.path).",
+        "operationId": "render_joined_projects__pid__render_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenderProjectRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Render Joined",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/projects/{pid}/scenes": {
+      "post": {
+        "description": "Создать сцену и поставить в очередь вырезку и разделение голосов. Id задачи — в заголовке X-Job-Id.",
+        "operationId": "create_scene_projects__pid__scenes_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SceneCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scene"
+                }
+              }
+            },
+            "description": "Successful Response",
+            "headers": {
+              "X-Job-Id": {
+                "description": "Id задачи подготовки сцены",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Scene",
+        "tags": [
+          "scenes"
+        ]
+      }
+    },
+    "/projects/{pid}/scenes/{scid}": {
+      "delete": {
+        "operationId": "delete_scene_projects__pid__scenes__scid__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "scid",
+            "required": true,
+            "schema": {
+              "title": "Scid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ok"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Scene",
+        "tags": [
+          "scenes"
+        ]
+      },
+      "get": {
+        "description": "Сцена. prepare_state: ready — голоса и фон готовы (stems_ready=true, все файлы на месте); running — готовится\n(или в очереди); interrupted — подготовка не дошла до конца (закрыли программу, отмена, ошибка) и не идёт:\nперезапуск — POST …/prepare.",
+        "operationId": "get_scene_projects__pid__scenes__scid__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scid",
+            "required": true,
+            "schema": {
+              "title": "Scid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scene"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Scene",
+        "tags": [
+          "scenes"
+        ]
+      },
+      "patch": {
+        "operationId": "patch_scene_projects__pid__scenes__scid__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "scid",
+            "required": true,
+            "schema": {
+              "title": "Scid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScenePatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scene"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Patch Scene",
+        "tags": [
+          "scenes"
+        ]
+      }
+    },
+    "/projects/{pid}/scenes/{scid}/prepare": {
+      "post": {
+        "description": "Подготовить сцену заново (вырезка, звук, голоса и фон): после прерванной подготовки или чтобы пересчитать.\nПока идёт, stems_ready=false; готовые дубли и настройки сведения остаются.",
+        "operationId": "prepare_projects__pid__scenes__scid__prepare_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "scid",
+            "required": true,
+            "schema": {
+              "title": "Scid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response",
+            "headers": {
+              "X-Job-Id": {
+                "description": "Id задачи подготовки сцены",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Prepare",
+        "tags": [
+          "scenes"
+        ]
+      }
+    },
+    "/projects/{pid}/scenes/{scid}/preview": {
+      "post": {
+        "operationId": "preview_projects__pid__scenes__scid__preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "scid",
+            "required": true,
+            "schema": {
+              "title": "Scid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Preview",
+        "tags": [
+          "scenes"
+        ]
+      }
+    },
+    "/projects/{pid}/scenes/{scid}/render": {
+      "post": {
+        "description": "Собрать ролик сцены. Файл с таким именем уже есть и body.overwrite=false → итог «<имя> (2).mp4», «(3)» …\nИтоговый путь — Job.result.path (и result.url, если файл внутри папки проекта).",
+        "operationId": "render_projects__pid__scenes__scid__render_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "scid",
+            "required": true,
+            "schema": {
+              "title": "Scid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenderSettings"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Render",
+        "tags": [
+          "scenes"
+        ]
+      }
+    },
+    "/projects/{pid}/scenes/{scid}/takes": {
+      "post": {
+        "description": "Дубль: нормализация, замеры, автоподгонка под реплику, разбор по тексту (если есть нейросети), ★ по умолчанию\nсамому полному дублю. Почти тишина (нет речи и пик ниже −40 дБFS, либо речь тише −50 дБFS по RMS) всё равно\nсохраняется, но с empty=true: ★ ему не ставится, в сведение он не идёт, предупреждение живёт и исчезает вместе с\nдублем. source=file — файл, а не запись: подгонка ставит его на место реплики, но «начал раньше/позже» тут не про него.",
+        "operationId": "upload_take_projects__pid__scenes__scid__takes_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "scid",
+            "required": true,
+            "schema": {
+              "title": "Scid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_take_projects__pid__scenes__scid__takes_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Take"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Upload Take",
+        "tags": [
+          "scenes"
+        ]
+      }
+    },
+    "/projects/{pid}/scenes/{scid}/takes/{tid}": {
+      "delete": {
+        "operationId": "remove_take_projects__pid__scenes__scid__takes__tid__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "scid",
+            "required": true,
+            "schema": {
+              "title": "Scid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "tid",
+            "required": true,
+            "schema": {
+              "title": "Tid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ok"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove Take",
+        "tags": [
+          "scenes"
+        ]
+      },
+      "patch": {
+        "description": "Сдвиг, длина и ★. selected=true — выбор человека: автовыбор его потом не меняет. Пустой дубль выбрать нельзя (409).",
+        "operationId": "patch_take_projects__pid__scenes__scid__takes__tid__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "scid",
+            "required": true,
+            "schema": {
+              "title": "Scid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "tid",
+            "required": true,
+            "schema": {
+              "title": "Tid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TakePatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Take"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Patch Take",
+        "tags": [
+          "scenes"
+        ]
+      }
+    },
+    "/projects/{pid}/scenes/{scid}/takes/{tid}/trim_tail": {
+      "post": {
+        "description": "Отрезать хвост-перезапуск («давай ещё раз») с места Take.tail_cut_s. Полный файл остаётся: untrim_tail вернёт его.\n409 — отрезать нечего.",
+        "operationId": "trim_take_tail_projects__pid__scenes__scid__takes__tid__trim_tail_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "scid",
+            "required": true,
+            "schema": {
+              "title": "Scid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "tid",
+            "required": true,
+            "schema": {
+              "title": "Tid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Take"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Trim Take Tail",
+        "tags": [
+          "scenes"
+        ]
+      }
+    },
+    "/projects/{pid}/scenes/{scid}/takes/{tid}/untrim_tail": {
+      "post": {
+        "description": "Вернуть дубль целиком, вместе с хвостом (отмена trim_tail).",
+        "operationId": "untrim_take_tail_projects__pid__scenes__scid__takes__tid__untrim_tail_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "scid",
+            "required": true,
+            "schema": {
+              "title": "Scid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "tid",
+            "required": true,
+            "schema": {
+              "title": "Tid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Take"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Untrim Take Tail",
+        "tags": [
+          "scenes"
+        ]
+      }
+    },
+    "/projects/{pid}/snap": {
+      "post": {
+        "description": "Выделение на шкале: прилипание к репликам и склейкам, разговор целиком или кадр.",
+        "operationId": "snap_projects__pid__snap_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SnapRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SnapResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Snap",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/projects/{pid}/speakers/merge": {
+      "post": {
+        "description": "Влить голос b в голос a (любые два голоса проекта; кнопка «Объединить» и ручное слияние — один и тот же роут).\nОтвет — проект плюс merge_id: по нему слияние отменяется (POST …/speakers/merges/{merge_id}/undo).",
+        "operationId": "merge_speakers_projects__pid__speakers_merge_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpeakerMerge"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MergedProject"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Merge Speakers",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/projects/{pid}/speakers/merges/{merge_id}/undo": {
+      "post": {
+        "description": "Отменить слияние: голос, его реплики, дубли и имя возвращаются как были. 404 — такого слияния нет или оно уже\nотменено; 409 — после него были другие слияния этих голосов, сначала отмени их.",
+        "operationId": "undo_speaker_merge_projects__pid__speakers_merges__merge_id__undo_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "merge_id",
+            "required": true,
+            "schema": {
+              "title": "Merge Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Undo Speaker Merge",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/projects/{pid}/speakers/{sid}": {
+      "patch": {
+        "operationId": "rename_speaker_projects__pid__speakers__sid__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pid",
+            "required": true,
+            "schema": {
+              "title": "Pid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpeakerRename"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rename Speaker",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/settings": {
+      "get": {
+        "description": "Настройки без ключей: ключи лежат только в системной связке ключей. У каждой модели — key_set (ключ сохранён),\nkey_status (unknown | ok | invalid) и key_message (по-русски, что не так).",
+        "operationId": "get_settings_settings_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "refresh",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Refresh",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppSettings"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Settings",
+        "tags": [
+          "settings"
+        ]
+      },
+      "put": {
+        "operationId": "put_settings_settings_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppSettings"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppSettings"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Settings",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/settings/llm/{provider_id}/check": {
+      "post": {
+        "description": "Проверить модель одним запросом. ok=false и key_status=invalid — ключ не подошёл; unknown — проверить не вышло.",
+        "operationId": "check_provider_settings_llm__provider_id__check_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider_id",
+            "required": true,
+            "schema": {
+              "title": "Provider Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Check Provider",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/settings/llm/{provider_id}/key": {
+      "delete": {
+        "operationId": "delete_key_settings_llm__provider_id__key_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider_id",
+            "required": true,
+            "schema": {
+              "title": "Provider Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ok"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Key",
+        "tags": [
+          "settings"
+        ]
+      },
+      "put": {
+        "description": "Сохранить ключ и сразу проверить его (один короткий запрос, до 10 с). Неверный ключ всё равно сохраняется,\nно key_status = invalid и key_message = «Ключ не подходит — проверь, что скопировал его целиком». Нет сети или\nсервис не ответил — unknown (ключ не считаем плохим).",
+        "operationId": "put_key_settings_llm__provider_id__key_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider_id",
+            "required": true,
+            "schema": {
+              "title": "Provider Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KeyBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KeyResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Key",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/settings/llm/{provider_id}/login": {
+      "post": {
+        "description": "Кнопка «Войти» у модели-подписки (Claude Code, Codex): открыть системный терминал с командой входа.\nКоманда берётся из фиксированного списка по виду модели — из запроса ничего не подставляется.",
+        "operationId": "login_provider_settings_llm__provider_id__login_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider_id",
+            "required": true,
+            "schema": {
+              "title": "Provider Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Login Provider",
+        "tags": [
+          "settings"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "system"
+    },
+    {
+      "name": "projects"
+    },
+    {
+      "name": "scenes"
+    },
+    {
+      "name": "files"
+    },
+    {
+      "name": "settings"
+    },
+    {
+      "name": "mic"
+    },
+    {
+      "name": "llm"
+    },
+    {
+      "name": "jobs"
+    }
+  ]
+}

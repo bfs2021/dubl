@@ -1,0 +1,168 @@
+name: Release
+
+# Релиз: тег v* (например v0.1.0) собирает установщики под три ОС и кладёт их в черновик релиза.
+# Ручной запуск (Actions → Release → Run workflow) только собирает установщики и прикладывает их к запуску
+# как артефакты (Summary → Artifacts); черновик релиза не создаётся, если не включить «release».
+# В поле «platforms» можно оставить, например, только «windows,linux».
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      platforms:
+        description: "Платформы через запятую: macos, windows, linux"
+        default: "macos,windows,linux"
+        type: string
+      release:
+        description: "Создать черновик релиза dev-N с установщиками (иначе только артефакты)"
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  plan:
+    name: План сборки
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+    steps:
+      - id: m
+        env:
+          PLATFORMS: ${{ github.event_name == 'workflow_dispatch' && inputs.platforms || 'macos,windows,linux' }}
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          # Intel-Mac не собираем: torch 2.5.1 для macOS x86_64 в PyPI нет (PyTorch прекратил сборки), нейросети не встанут.
+          # ubuntu-22.04: старее glibc — AppImage/deb запустятся и на более старых дистрибутивах
+          all_ = [
+              {"name": "macOS (Apple Silicon) · dmg", "os": "macos-latest", "platform": "macos"},
+              {"name": "Windows x64 · nsis + msi", "os": "windows-latest", "platform": "windows"},
+              {"name": "Linux x64 · AppImage + deb", "os": "ubuntu-22.04", "platform": "linux"},
+          ]
+          want = {p.strip().lower() for p in os.environ["PLATFORMS"].split(",") if p.strip()}
+          inc = [m for m in all_ if m["platform"] in want]
+          if not inc:
+              raise SystemExit("Не выбрана ни одна платформа (macos, windows, linux)")
+          print("matrix=" + json.dumps({"include": inc}))
+          PY
+
+  build:
+    name: ${{ matrix.name }}
+    needs: plan
+    runs-on: ${{ matrix.os }}
+    env:
+      APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+      # тег v* — всегда релиз; ручной запуск — только если включено «release»
+      PUBLISH: ${{ github.ref_type == 'tag' || (github.event_name == 'workflow_dispatch' && inputs.release) }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - uses: astral-sh/setup-uv@v10.3.2
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            app/src-tauri -> target
+            packaging/launcher -> target
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
+
+      - name: Зависимости интерфейса
+        working-directory: app
+        run: pnpm install --frozen-lockfile
+
+      - name: Системные библиотеки Tauri (Linux)
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev libxdo-dev
+
+      - name: Движок (PyInstaller) + лаунчер + ffmpeg → app/src-tauri
+        run: python packaging/prepare_bundle.py
+
+      - name: Дымовая проверка sidecar
+        run: python packaging/smoke_sidecar.py --stage app/src-tauri
+
+      # ── macOS: подпись ресурсов движка (Tauri сам в resources не заходит) ──
+      - name: macOS · ключ в связку ключей и подпись ресурсов
+        if: matrix.platform == 'macos' && env.APPLE_CERTIFICATE != ''
+        env:
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+        run: |
+          echo "$APPLE_CERTIFICATE" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security create-keychain -p ci "$RUNNER_TEMP/build.keychain"
+          security set-keychain-settings -lut 21600 "$RUNNER_TEMP/build.keychain"
+          security unlock-keychain -p ci "$RUNNER_TEMP/build.keychain"
+          security import "$RUNNER_TEMP/cert.p12" -k "$RUNNER_TEMP/build.keychain" -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ci "$RUNNER_TEMP/build.keychain"
+          security list-keychains -d user -s "$RUNNER_TEMP/build.keychain" login.keychain
+          rm "$RUNNER_TEMP/cert.p12"
+          python packaging/sign_macos.py --identity "$APPLE_SIGNING_IDENTITY" --root app/src-tauri/resources
+
+      # Релиз (тег или «release»): tauri-action собирает и кладёт установщики в черновик релиза.
+      - name: Сборка и публикация (tauri-action)
+        if: env.PUBLISH == 'true'
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # macOS: подпись .app и нотаризация (если секретов нет — соберётся неподписанный dmg)
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        with:
+          projectPath: app
+          tagName: ${{ github.ref_type == 'tag' && github.ref_name || format('dev-{0}', github.run_number) }}
+          releaseName: "Дубль ${{ github.ref_type == 'tag' && github.ref_name || format('dev-{0}', github.run_number) }}"
+          releaseBody: "Установщики для macOS (Apple Silicon), Windows и Linux. Нейросети докачиваются при первом запуске. Установщики не подписаны: подсказки по первому запуску — в README. Подробности сборки: docs/BUILD.md."
+          releaseDraft: true
+          prerelease: false
+          args: >-
+            --config ${{ github.workspace }}/packaging/tauri-config/common.json
+            --config ${{ github.workspace }}/packaging/tauri-config/${{ matrix.platform }}.json
+
+      # Ручной запуск без релиза: без tagName tauri-action только собирает установщики.
+      - name: Сборка (tauri-action, без релиза)
+        if: env.PUBLISH != 'true'
+        uses: tauri-apps/tauri-action@v0
+        env:
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        with:
+          projectPath: app
+          args: >-
+            --config ${{ github.workspace }}/packaging/tauri-config/common.json
+            --config ${{ github.workspace }}/packaging/tauri-config/${{ matrix.platform }}.json
+
+      # Установщики как артефакты запуска — всегда (в том числе и без тега), чтобы их можно было скачать и проверить
+      - name: Установщики → артефакты запуска
+        uses: actions/upload-artifact@v7
+        with:
+          name: dubl-${{ matrix.platform }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            app/src-tauri/target/release/bundle/dmg/*.dmg
+            app/src-tauri/target/release/bundle/nsis/*.exe
+            app/src-tauri/target/release/bundle/msi/*.msi
+            app/src-tauri/target/release/bundle/appimage/*.AppImage
+            app/src-tauri/target/release/bundle/deb/*.deb

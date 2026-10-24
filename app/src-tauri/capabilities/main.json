@@ -1,0 +1,67 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main",
+  "description": "Минимальные права главного окна: диалоги выбора файлов и запуск движка (sidecar).",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "allow-engine-url",
+    "allow-ml-pack-status",
+    "allow-install-ml-pack",
+    "allow-cancel-ml-pack",
+    "allow-ml-pack-state",
+    "dialog:allow-open",
+    "dialog:allow-save",
+    {
+      "identifier": "shell:allow-spawn",
+      "allow": [
+        {
+          "name": "binaries/dubl-engine",
+          "sidecar": true,
+          "args": [
+            "--port",
+            {
+              "validator": "\\d+"
+            },
+            "--data-dir",
+            {
+              "validator": ".+"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "binaries/dubl-engine",
+          "sidecar": true,
+          "args": [
+            "--port",
+            {
+              "validator": "\\d+"
+            },
+            "--data-dir",
+            {
+              "validator": ".+"
+            }
+          ]
+        }
+      ]
+    },
+    "shell:allow-open",
+    "opener:allow-reveal-item-in-dir",
+    {
+      "identifier": "opener:allow-open-path",
+      "allow": [
+        { "path": "$HOME/**" },
+        { "path": "$VIDEO/**" },
+        { "path": "/Volumes/**" }
+      ]
+    },
+    "shell:allow-kill"
+  ]
+}

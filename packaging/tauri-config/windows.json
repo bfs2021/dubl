@@ -1,0 +1,9 @@
+{
+  "bundle": {
+    "targets": ["nsis", "msi"],
+    "windows": {
+      "nsis": { "languages": ["Russian", "English"], "displayLanguageSelector": false, "installMode": "currentUser" },
+      "wix": { "language": ["ru-RU", "en-US"] }
+    }
+  }
+}

@@ -1,0 +1,1080 @@
+{
+ "about": "Эталон бенчмарка ASR «Дубль»: Tears of Steel (CC-BY 3.0, Blender Foundation), тексты — официальные английские субтитры TOS-en.srt. Эталон для других роликов (русский дубляж и т. п.) в репозиторий не кладём: формат описан в README, путь задаётся --ref или DUBL_BENCH_REF. conf=low/mid — где эталон сомнителен.",
+ "sets": {
+  "en": {
+   "lang": "en",
+   "tags": [
+    "tos_full",
+    "tos_voices"
+   ],
+   "pieces": [
+    {
+     "id": "t1",
+     "title": "0:20–1:05 спор Тома и Селии + музыка",
+     "start": 20.0,
+     "end": 65.0,
+     "nonverbal": [],
+     "lines": [
+      {
+       "start": 23.22,
+       "end": 24.0,
+       "text": "You're a jerk, Thom.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        23.0,
+        24.5
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         22.88,
+         24.32
+        ]
+       }
+      },
+      {
+       "start": 24.48,
+       "end": 27.06,
+       "text": "Look Celia, we have to follow our passions;",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        25.0,
+        27.0
+       ],
+       "bound": {
+        "start": "consensus(3)",
+        "end": "energy",
+        "consensus": [
+         24.48,
+         26.84
+        ]
+       }
+      },
+      {
+       "start": 27.08,
+       "end": 30.12,
+       "text": "you have your robotics, and I just want to be awesome in space.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        27.0,
+        30.5
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         27.2,
+         30.1
+        ]
+       }
+      },
+      {
+       "start": 30.48,
+       "end": 34.5,
+       "text": "Why don't you just admit that you're freaked out by my robot hand?",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        30.8,
+        34.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         30.56,
+         34.42
+        ]
+       }
+      },
+      {
+       "start": 34.6,
+       "end": 35.98,
+       "text": "I'm not freaked out by it's",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        34.5,
+        36.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         34.58,
+         36.02
+        ]
+       }
+      },
+      {
+       "start": 37.62,
+       "end": 38.56,
+       "text": "alright! Fine!",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        37.0,
+        38.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         37.66,
+         38.38
+        ]
+       }
+      },
+      {
+       "start": 38.62,
+       "end": 40.86,
+       "text": "I'm freaked out! I'm having nightmares that I'm being chased",
+       "conf": "mid",
+       "note": "субтитры, исправлено под звук: «I have nightmares» → «I'm having nightmares» (так у всех 3 моделей)",
+       "srt": [
+        38.0,
+        41.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "consensus(3)",
+        "consensus": [
+         38.52,
+         40.86
+        ]
+       }
+      },
+      {
+       "start": 40.86,
+       "end": 42.0,
+       "text": "by these giant robotic claws of death",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        41.0,
+        42.0
+       ],
+       "bound": {
+        "start": "consensus(3)",
+        "end": "consensus(0)",
+        "consensus": [
+         40.86,
+         42.0
+        ]
+       }
+      },
+      {
+       "start": 42.42,
+       "end": 44.73,
+       "text": "Whatever, Thom. We're done.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        42.2,
+        45.0
+       ],
+       "bound": {
+        "start": "consensus(1)",
+        "end": "consensus(2)",
+        "consensus": [
+         42.42,
+         44.73
+        ]
+       }
+      },
+      {
+       "start": 50.1,
+       "end": 53.58,
+       "text": "Robot's memory synced and locked!",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        50.0,
+        53.5
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         50.0,
+         53.61
+        ]
+       }
+      },
+      {
+       "start": 60.9,
+       "end": 62.28,
+       "text": "This is pretty freaky.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        61.0,
+        63.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         61.04,
+         62.22
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "t2",
+     "title": "3:08–4:10 подготовка к съёмке",
+     "start": 188.0,
+     "end": 250.0,
+     "nonverbal": [],
+     "lines": [
+      {
+       "start": 191.3,
+       "end": 192.08,
+       "text": "Are you ready?",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        191.0,
+        192.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         191.16,
+         192.03
+        ]
+       }
+      },
+      {
+       "start": 192.72,
+       "end": 194.44,
+       "text": "Of course you're ready, you're a rockstar.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        193.0,
+        195.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "consensus(3)",
+        "consensus": [
+         192.43,
+         194.44
+        ]
+       }
+      },
+      {
+       "start": 196.84,
+       "end": 198.3,
+       "text": "How's it looking, Barley?",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        197.0,
+        198.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         196.84,
+         198.18
+        ]
+       }
+      },
+      {
+       "start": 198.82,
+       "end": 200.7,
+       "text": "We should have about ten minutes",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        199.0,
+        201.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         198.82,
+         200.5
+        ]
+       }
+      },
+      {
+       "start": 201.76,
+       "end": 202.88,
+       "text": "Well that's perfect.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        201.5,
+        203.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         201.56,
+         202.74
+        ]
+       }
+      },
+      {
+       "start": 203.62,
+       "end": 206.52,
+       "text": "We're on in one! All systems go! Yeah you, go!",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        203.5,
+        206.5
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "consensus(3)",
+        "consensus": [
+         203.48,
+         206.52
+        ]
+       }
+      },
+      {
+       "start": 208.0,
+       "end": 212.46,
+       "text": "Go! Move your asses! Go go go!",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        208.0,
+        212.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         207.84,
+         212.12
+        ]
+       }
+      },
+      {
+       "start": 212.58,
+       "end": 217.0,
+       "text": "I love it! Come on, go!",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        213.0,
+        217.0
+       ],
+       "bound": {
+        "start": "consensus(1)",
+        "end": "consensus(0)",
+        "consensus": [
+         212.58,
+         217.0
+        ]
+       }
+      },
+      {
+       "start": 222.92,
+       "end": 223.88,
+       "text": "That's nice.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        223.0,
+        224.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         222.68,
+         223.89
+        ]
+       }
+      },
+      {
+       "start": 224.34,
+       "end": 225.64,
+       "text": "Nothing to worry about.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        224.5,
+        225.7
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         224.36,
+         225.6
+        ]
+       }
+      },
+      {
+       "start": 225.66,
+       "end": 227.0,
+       "text": "Thom.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        226.0,
+        227.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "consensus(0)",
+        "consensus": [
+         225.66,
+         227.0
+        ]
+       }
+      },
+      {
+       "start": 232.14,
+       "end": 232.92,
+       "text": "There she is.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        231.0,
+        233.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         231.91,
+         232.77
+        ]
+       }
+      },
+      {
+       "start": 233.68,
+       "end": 233.96,
+       "text": "Now.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        233.5,
+        234.5
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         233.68,
+         233.93
+        ]
+       }
+      },
+      {
+       "start": 235.44,
+       "end": 236.24,
+       "text": "You love her.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        235.0,
+        236.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         235.38,
+         236.23
+        ]
+       }
+      },
+      {
+       "start": 237.5,
+       "end": 238.4,
+       "text": "She's your passion!",
+       "conf": "mid",
+       "note": "субтитры, исправлено под звук: «She is your passion» → «She's your passion» (так у всех 3 моделей)",
+       "srt": [
+        237.0,
+        238.5
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         237.28,
+         238.41
+        ]
+       }
+      },
+      {
+       "start": 239.74,
+       "end": 240.52,
+       "text": "Be tender to her.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        240.0,
+        241.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         239.44,
+         240.52
+        ]
+       }
+      },
+      {
+       "start": 241.54,
+       "end": 244.24,
+       "text": "Be honest! Eh be tender.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        241.5,
+        244.5
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         241.36,
+         244.15
+        ]
+       }
+      },
+      {
+       "start": 245.58,
+       "end": 247.92,
+       "text": "Remind her what love is.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        245.0,
+        248.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         245.44,
+         247.89
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "t3",
+     "title": "4:50–6:40 сцена на мосту, крики",
+     "start": 290.0,
+     "end": 399.0,
+     "nonverbal": [
+      [
+       373.5,
+       375.5
+      ],
+      [
+       378.5,
+       380.5
+      ],
+      [
+       380.5,
+       383.5
+      ]
+     ],
+     "lines": [
+      {
+       "start": 292.76,
+       "end": 294.7,
+       "text": "and, action!",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        292.0,
+        295.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "consensus(1)",
+        "consensus": [
+         292.8,
+         294.7
+        ]
+       }
+      },
+      {
+       "start": 296.78,
+       "end": 298.38,
+       "text": "Memory override in progress!",
+       "conf": "mid",
+       "note": "субтитры, исправлено под звук: «Memory overwrite» → «Memory override» (так у всех 3 моделей)",
+       "srt": [
+        296.5,
+        298.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         296.66,
+         298.23
+        ]
+       }
+      },
+      {
+       "start": 299.28,
+       "end": 301.14,
+       "text": "You're a jerk, Thom!",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        299.0,
+        301.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "consensus(2)",
+        "consensus": [
+         299.04,
+         301.14
+        ]
+       }
+      },
+      {
+       "start": 302.12,
+       "end": 305.38,
+       "text": "Ohp Sorry! Sorry.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        302.5,
+        305.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         302.0,
+         305.15
+        ]
+       }
+      },
+      {
+       "start": 316.02,
+       "end": 316.76,
+       "text": "Look Celia.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        316.0,
+        317.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         315.72,
+         316.65
+        ]
+       }
+      },
+      {
+       "start": 318.38,
+       "end": 320.3,
+       "text": "We have to follow our passions.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        318.0,
+        320.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         318.16,
+         320.13
+        ]
+       }
+      },
+      {
+       "start": 321.38,
+       "end": 322.5,
+       "text": "You have your robotics",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        321.0,
+        323.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         321.2,
+         322.6
+        ]
+       }
+      },
+      {
+       "start": 325.18,
+       "end": 327.74,
+       "text": "and I just want to be awesome in space.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        325.0,
+        328.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         325.04,
+         327.65
+        ]
+       }
+      },
+      {
+       "start": 338.92,
+       "end": 341.14,
+       "text": "Okay, they're coming. Two minutes left!",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        339.0,
+        341.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         339.0,
+         341.0
+        ]
+       }
+      },
+      {
+       "start": 342.84,
+       "end": 344.26,
+       "text": "Speed it up, Thom!",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        343.0,
+        344.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         342.76,
+         344.0
+        ]
+       }
+      },
+      {
+       "start": 344.86,
+       "end": 346.4,
+       "text": "Vivacissimo!",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        345.0,
+        346.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         344.9,
+         346.5
+        ]
+       }
+      },
+      {
+       "start": 346.68,
+       "end": 349.96,
+       "text": "Why don't you just admit that you're  freaked out by my robot hand?",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        347.0,
+        350.0
+       ],
+       "bound": {
+        "start": "consensus(3)",
+        "end": "energy",
+        "consensus": [
+         346.68,
+         349.85
+        ]
+       }
+      },
+      {
+       "start": 356.52,
+       "end": 358.88,
+       "text": "Listen Celia, I was young",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        356.0,
+        359.0
+       ],
+       "bound": {
+        "start": "consensus(3)",
+        "end": "energy",
+        "consensus": [
+         356.52,
+         358.74
+        ]
+       }
+      },
+      {
+       "start": 359.72,
+       "end": 360.54,
+       "text": "and a dick.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        359.5,
+        361.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         359.8,
+         360.54
+        ]
+       }
+      },
+      {
+       "start": 361.26,
+       "end": 363.02,
+       "text": "But there's no reason to destroy the world.",
+       "conf": "mid",
+       "note": "субтитры, исправлено под звук: «But that's no reason» → «But there's no reason» (так у всех 3 моделей)",
+       "srt": [
+        361.0,
+        363.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         361.0,
+         362.95
+        ]
+       }
+      },
+      {
+       "start": 364.48,
+       "end": 365.84,
+       "text": "Why does he do this?",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        365.0,
+        366.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         364.68,
+         365.86
+        ]
+       }
+      },
+      {
+       "start": 366.92,
+       "end": 368.54,
+       "text": "We already tried that one!",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        366.5,
+        368.5
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         366.84,
+         368.48
+        ]
+       }
+      },
+      {
+       "start": 371.96,
+       "end": 372.44,
+       "text": "Abort!",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        371.5,
+        372.5
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "consensus(1)",
+        "consensus": [
+         371.76,
+         372.44
+        ]
+       }
+      },
+      {
+       "start": 373.34,
+       "end": 374.0,
+       "text": "Cut!",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        373.0,
+        374.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "consensus(0)",
+        "consensus": [
+         373.0,
+         374.0
+        ]
+       }
+      },
+      {
+       "start": 383.54,
+       "end": 384.96,
+       "text": "You broke my heart.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        383.0,
+        385.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         383.62,
+         384.82
+        ]
+       }
+      },
+      {
+       "start": 385.76,
+       "end": 386.56,
+       "text": "I know.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        386.0,
+        387.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         385.7,
+         386.43
+        ]
+       }
+      },
+      {
+       "start": 386.94,
+       "end": 388.68,
+       "text": "You forgot me on earth.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        387.0,
+        389.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         387.0,
+         388.67
+        ]
+       }
+      },
+      {
+       "start": 389.24,
+       "end": 389.78,
+       "text": "I know.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        389.0,
+        390.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         389.02,
+         389.65
+        ]
+       }
+      },
+      {
+       "start": 390.5,
+       "end": 392.5,
+       "text": "I should just crush you.",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        390.5,
+        393.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         390.36,
+         392.29
+        ]
+       }
+      },
+      {
+       "start": 397.14,
+       "end": 397.3,
+       "text": "I'm-",
+       "conf": "high",
+       "note": "официальные субтитры",
+       "srt": [
+        396.0,
+        397.0
+       ],
+       "bound": {
+        "start": "energy",
+        "end": "energy",
+        "consensus": [
+         396.98,
+         397.52
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

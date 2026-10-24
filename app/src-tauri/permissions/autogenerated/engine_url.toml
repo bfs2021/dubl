@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-engine-url"
+description = "Enables the engine_url command without any pre-configured scope."
+commands.allow = ["engine_url"]
+
+[[permission]]
+identifier = "deny-engine-url"
+description = "Denies the engine_url command without any pre-configured scope."
+commands.deny = ["engine_url"]

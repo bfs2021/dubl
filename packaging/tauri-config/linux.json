@@ -1,0 +1,6 @@
+{
+  "productName": "Dubl",
+  "bundle": {
+    "targets": ["appimage", "deb"]
+  }
+}

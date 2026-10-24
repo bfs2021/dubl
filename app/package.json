@@ -1,0 +1,52 @@
+{
+  "name": "dubl-app",
+  "private": true,
+  "description": "Дубль — открытая программа для любительской озвучки",
+  "license": "GPL-3.0-or-later",
+  "author": "Тимур (pingvin1337) и участники проекта",
+  "homepage": "https://github.com/pingvin1337/dubl",
+  "repository": { "type": "git", "url": "git+https://github.com/pingvin1337/dubl.git" },
+  "bugs": { "url": "https://github.com/pingvin1337/dubl/issues" },
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --port 1420",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "tauri": "tauri",
+    "gen:api": "cd ../engine && .venv/bin/python -m dubl_engine.export_openapi ../docs/openapi.json && cd ../app && npx -y -p openapi-typescript@7 -p typescript@5 openapi-typescript ../docs/openapi.json -o src/api/schema.gen.ts",
+    "check:api": "pnpm gen:api && git diff --exit-code -- src/api/schema.gen.ts ../docs/openapi.json",
+    "e2e": "node e2e/live.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/onest": "^5.3.1",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@tauri-apps/api": "^2.12.4",
+    "@tauri-apps/plugin-dialog": "^2.8.3",
+    "@tauri-apps/plugin-opener": "^2.7.2",
+    "@tauri-apps/plugin-shell": "^2.5.0",
+    "lucide-react": "^1.59.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.6",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.12.3",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
+    "@types/node": "^26.6.5",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^6.1.2",
+    "jsdom": "^30.1.3",
+    "playwright-core": "^1.64.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5"
+  }
+}

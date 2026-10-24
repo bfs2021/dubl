@@ -1,0 +1,25 @@
+name: Предложить функцию
+description: Идея, которая сделает озвучку проще для любителя
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Дубль остаётся простым: функция попадает в программу, только если упрощает озвучку. Ручного монтажа, клонирования голоса и подделки губ не будет (см. «Чего здесь нет» в справке).
+  - type: textarea
+    id: problem
+    attributes:
+      label: Какую задачу ты решаешь
+      description: Что не получается или получается неудобно сейчас.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Как это могло бы работать
+    validations:
+      required: true
+  - type: textarea
+    id: alt
+    attributes:
+      label: Чем обходишься сейчас (по желанию)

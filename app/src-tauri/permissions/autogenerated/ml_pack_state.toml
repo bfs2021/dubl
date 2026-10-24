@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-ml-pack-state"
+description = "Enables the ml_pack_state command without any pre-configured scope."
+commands.allow = ["ml_pack_state"]
+
+[[permission]]
+identifier = "deny-ml-pack-state"
+description = "Denies the ml_pack_state command without any pre-configured scope."
+commands.deny = ["ml_pack_state"]

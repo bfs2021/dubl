@@ -1,0 +1,154 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  engine:
+    name: Движок (pytest) · ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: engine/pyproject.toml
+      # ffmpeg ставим тем же скриптом, что и для релиза — заодно он проверяется на всех ОС
+      - name: ffmpeg
+        shell: bash
+        run: |
+          python packaging/fetch_ffmpeg.py --out "$RUNNER_TEMP/ffmpeg"
+          echo "$RUNNER_TEMP/ffmpeg" >> "$GITHUB_PATH"
+      # extra ml (torch, whisper, onnx-asr…) не ставим: быстрые тесты идут без нейросетей, тяжёлое импортируется лениво
+      - name: Установка движка (без нейросетей)
+        run: python -m pip install -e "engine[dev]"
+      # то же, что локально: без slow и без tests/e2e (им нужны нейросети и скачанные фильмы)
+      - name: Быстрые тесты
+        working-directory: engine
+        run: python -m pytest -q -m "not slow" --ignore=tests/e2e
+
+  app:
+    name: Фронт · ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10 # lockfileVersion 9.0 читают pnpm 9/10/11
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      # check:api запускает движок из engine/.venv/bin/python (путь Unix) и git diff — на Windows не работает
+      - uses: actions/setup-python@v7
+        if: runner.os != 'Windows'
+        with:
+          python-version: "3.11"
+      - name: Окружение движка для gen:api
+        if: runner.os != 'Windows'
+        working-directory: engine
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install -e .
+      - name: Типы API не устарели (pnpm check:api)
+        if: runner.os != 'Windows'
+        run: pnpm check:api
+      - run: pnpm build         # tsc --noEmit + vite build
+      - run: pnpm test          # vitest
+
+  tauri-check:
+    name: Оболочка (cargo check) · ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            app/src-tauri -> target
+            packaging/launcher -> target
+      - name: Системные библиотеки Tauri (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev libxdo-dev
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
+      - name: Заглушки sidecar и ресурсов (tauri-build проверяет, что файлы существуют)
+        shell: bash
+        run: |
+          triple=$(rustc --print host-tuple)
+          ext=""; [ "$RUNNER_OS" = "Windows" ] && ext=".exe"
+          mkdir -p app/src-tauri/binaries app/src-tauri/resources/engine app/src-tauri/resources/ffmpeg
+          : > "app/src-tauri/binaries/dubl-engine-$triple$ext"
+          touch app/src-tauri/resources/engine/.keep app/src-tauri/resources/ffmpeg/.keep
+      - run: pnpm install --frozen-lockfile
+        working-directory: app
+      - run: pnpm build
+        working-directory: app
+      - name: cargo check (оболочка)
+        working-directory: app/src-tauri
+        run: cargo check
+      - name: cargo build (лаунчер sidecar)
+        working-directory: packaging/launcher
+        run: cargo build --release
+
+  sidecar:
+    name: Сборка sidecar + ffmpeg · ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - uses: astral-sh/setup-uv@v10.3.2
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packaging/launcher -> target
+      - name: PyInstaller + лаунчер
+        run: python packaging/build_engine.py
+      - name: ffmpeg
+        run: python packaging/fetch_ffmpeg.py
+      - name: Дымовая проверка (READY, /health, ffmpeg, сирота)
+        run: python packaging/smoke_sidecar.py
+      - name: Размер
+        shell: bash
+        run: du -sh packaging/build/stage/* packaging/build/stage/resources/* || true

@@ -1,0 +1,69 @@
+[project]
+name = "dubl-engine"
+version = "0.1.0"
+description = "Движок «Дубль»: разбор видео, разделение голосов, подгонка дублей, сведение и рендер"
+license = "GPL-3.0-or-later"
+authors = [{ name = "Тимур (pingvin1337) и участники проекта" }]
+requires-python = ">=3.11,<3.12"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "pydantic>=2.7",
+  "platformdirs>=4",
+  "numpy<2",
+  "scipy>=1.13",
+  "soundfile>=0.12",
+  "pyloudnorm>=0.1.1",
+  "httpx>=0.27",
+  "keyring>=25",
+  "python-multipart>=0.0.9",
+  "yt-dlp>=2024.8",
+]
+
+[project.optional-dependencies]
+ml = [
+  "torch==2.5.1",
+  "torchaudio==2.5.1",
+  "faster-whisper>=1.0",
+  "demucs>=4.0",
+  # analysis/diarize, audio/separate
+  "speechbrain>=1.0",
+  "scikit-learn>=1.3",
+  "audio-separator>=0.30",
+  # analysis/gigaam: GigaAM v3 (русская речь) через ONNX — без torch, одинаково на Mac/Windows/Linux
+  "onnx-asr>=0.12",
+  "onnxruntime>=1.18,!=1.24.1,!=1.25.*,!=1.26.0",
+  # опционально, для pyannote/speaker-diarization-3.1 (нужен токен HF): "pyannote.audio>=3.1"
+]
+# analysis/transcribe: mlx-whisper — только Mac на Apple Silicon (GPU); на остальных платформах не ставится, работает faster-whisper
+mlx = [
+  "mlx-whisper>=0.4.3; sys_platform == 'darwin' and platform_machine == 'arm64'",
+]
+# scikit-learn нужен быстрым тестам кластеризации голосов (analysis/diarize); в рабочем «лёгком» движке его нет
+dev = ["pytest>=8", "pytest-asyncio>=0.23", "ruff>=0.5", "scikit-learn>=1.3"]
+
+[project.scripts]
+dubl-engine = "dubl_engine.main:run"
+
+[project.urls]
+Homepage = "https://github.com/pingvin1337/dubl"
+Repository = "https://github.com/pingvin1337/dubl"
+Issues = "https://github.com/pingvin1337/dubl/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/dubl_engine"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "slow: тесты с нейросетями и скачиванием моделей (pytest -m slow)",
+]
+addopts = "-m 'not slow'"
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"

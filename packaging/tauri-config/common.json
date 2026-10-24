@@ -1,0 +1,8 @@
+{
+  "bundle": {
+    "resources": {
+      "resources/engine/": "engine/",
+      "resources/ffmpeg/": "ffmpeg/"
+    }
+  }
+}

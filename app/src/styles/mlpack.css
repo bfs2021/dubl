@@ -1,0 +1,14 @@
+/* «Скачать нейросети»: плашка на главном, в настройках и на экране разбора */
+.mlpack { display: grid; gap: 8px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--amber); background: var(--amberA); font-size: 13px; line-height: 1.45; }
+.mlpack.bad { border-color: #5a2a24; background: #221110; }
+.mlpack.ok { border-color: var(--line2); background: var(--p2); }
+.mlpack .mlrow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.mlpack .mlrow .grow { flex: 1; min-width: 220px; }
+.mlpack .mltitle { font-weight: 600; }
+.mlpack .mldetail { font-size: 12px; color: var(--mute); min-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mlpack .mlcmd { font-family: var(--mono, "JetBrains Mono", monospace); font-size: 12px; background: var(--p1); border: 1px solid var(--line2); border-radius: 4px; padding: 1px 6px; }
+.mlpack details { font-size: 12px; color: var(--mute); }
+.mlpack details pre { white-space: pre-wrap; word-break: break-word; margin: 4px 0 0; max-height: 120px; overflow: auto; }
+
+.spin { animation: mlspin 1s linear infinite; }
+@keyframes mlspin { to { transform: rotate(360deg); } }

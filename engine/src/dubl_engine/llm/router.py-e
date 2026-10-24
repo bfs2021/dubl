@@ -1,0 +1,68 @@
+"""Маршрутизация задач ИИ по настройкам пользователя.
+
+Нет настроенной модели для задачи → None, и программа работает без ИИ.
+"""
+from __future__ import annotations
+
+import re
+
+from ..models import LLMSettings, LLMTask, ProviderConfig, ProviderKind
+from . import secrets
+from .providers import LLMProvider, make_provider, needs_key
+
+CHEAP_TASKS = (LLMTask.TRANSLATE, LLMTask.FIT_LENGTH, LLMTask.NAME_SPEAKERS)
+
+_CHEAP = re.compile(r"flash|haiku|mini|lite|nano|small|8b|instant|turbo", re.IGNORECASE)
+_TOP = re.compile(r"opus|[-_ ]pro\b|reasoner|large|ultra|gpt-5(?!.*mini)|o1|o3", re.IGNORECASE)
+_MID = re.compile(r"sonnet|chat|medium|4o\b|gpt-4", re.IGNORECASE)
+
+
+def model_tier(cfg: ProviderConfig) -> int:
+    """Грубая оценка «силы» модели по названию: 0 — дешёвая и быстрая, 1 — обычная, 2 — сильная, 3 — лучшая."""
+    name = cfg.model or ""
+    if _CHEAP.search(name):
+        return 0
+    if _TOP.search(name):
+        return 3
+    if _MID.search(name):
+        return 2
+    return 1
+
+
+def default_routing(providers: list[ProviderConfig]) -> dict[LLMTask, str | None]:
+    """Умолчания: дешёвая модель — переводу, укладке и именам; сильнейшая — режиссёру.
+
+    Среди равных выигрывает тот, кто раньше в списке. Включённых нет → всё None.
+    """
+    usable = [p for p in providers if p.enabled]
+    if not usable:
+        return {t: None for t in LLMTask}
+    cheap = min(usable, key=lambda p: model_tier(p))     # min/max берут первый из равных
+    best = max(usable, key=lambda p: model_tier(p))
+    routing: dict[LLMTask, str | None] = {t: cheap.id for t in CHEAP_TASKS}
+    routing[LLMTask.DIRECTOR] = best.id
+    return routing
+
+
+def provider_config_for(task: LLMTask, settings: LLMSettings) -> ProviderConfig | None:
+    pid = settings.routing.get(task)
+    if not pid:
+        return None
+    for p in settings.providers:
+        if p.id == pid and p.enabled:
+            return p
+    return None
+
+
+def provider_for(task: LLMTask, settings: LLMSettings) -> LLMProvider | None:
+    """Модель для задачи или None, если ИИ для неё не настроен (нет маршрута, выключена, нет ключа)."""
+    cfg = provider_config_for(task, settings)
+    if cfg is None:
+        return None
+    if cfg.kind == ProviderKind.CLAUDE_CLI:
+        from .providers import ClaudeCliProvider
+        if ClaudeCliProvider.binary() is None:
+            return None
+    elif needs_key(cfg.kind) and not secrets.has_key(cfg.id):
+        return None
+    return make_provider(cfg)

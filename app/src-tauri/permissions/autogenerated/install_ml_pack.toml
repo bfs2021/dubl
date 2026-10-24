@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-install-ml-pack"
+description = "Enables the install_ml_pack command without any pre-configured scope."
+commands.allow = ["install_ml_pack"]
+
+[[permission]]
+identifier = "deny-install-ml-pack"
+description = "Denies the install_ml_pack command without any pre-configured scope."
+commands.deny = ["install_ml_pack"]

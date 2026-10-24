@@ -1,0 +1,44 @@
+name: Сообщить об ошибке
+description: Что-то не работает или работает не так, как ожидалось
+labels: ["bug"]
+body:
+  - type: textarea
+    id: did
+    attributes:
+      label: Что ты делал
+      description: Шаги по порядку: какой экран, какая кнопка, какой файл (формат и длина, без самого файла).
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Что ожидал
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Что получилось
+      description: Текст ошибки, если он был. Скриншот поможет.
+    validations:
+      required: true
+  - type: textarea
+    id: about
+    attributes:
+      label: Сведения из «О программе»
+      description: «Настройки → О программе → Скопировать сведения для сообщения об ошибке», потом вставь сюда. Ключей и путей к файлам там нет.
+      render: text
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Система
+      options: [macOS, Windows 10, Windows 11, Linux]
+    validations:
+      required: true
+  - type: input
+    id: os_version
+    attributes:
+      label: Версия системы и устройство (по желанию)
+      description: Например, «macOS 15, Mac с чипом M2, 16 ГБ» или «Windows 11, видеокарта NVIDIA».

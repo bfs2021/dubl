@@ -1,0 +1,2486 @@
+{
+ "model": "app_auto",
+ "input": "tos_full.wav",
+ "lang": "en",
+ "device": "app",
+ "load_s": null,
+ "asr_s": 39.25,
+ "audio_s": 734.1,
+ "info": {
+  "language_probs": [
+   {
+    "en": 0.9988443851470947,
+    "es": 0.000173834603629075,
+    "de": 0.00014077556261327118
+   },
+   {
+    "ru": 0.6486259698867798,
+    "en": 0.18082191050052643,
+    "es": 0.03204188495874405
+   },
+   {
+    "en": 0.9915937185287476,
+    "de": 0.0010906935203820467,
+    "es": 0.0009892161469906569
+   }
+  ],
+  "language_source": "speech",
+  "asr_engine": "whisper",
+  "notes": []
+ },
+ "notes": [],
+ "chunking": "приложение: analysis/speech.recognize",
+ "peak_rss_mb": 2109.1,
+ "segments": [
+  {
+   "start": 4.1800000000000015,
+   "end": 9.56,
+   "text": "We have main engine start. Four, three, two, one.",
+   "words": [
+    {
+     "start": 4.1800000000000015,
+     "end": 4.82,
+     "text": "We",
+     "prob": 0.33203125
+    },
+    {
+     "start": 4.82,
+     "end": 5.16,
+     "text": "have",
+     "prob": 0.984375
+    },
+    {
+     "start": 5.16,
+     "end": 5.44,
+     "text": "main",
+     "prob": 0.869140625
+    },
+    {
+     "start": 5.44,
+     "end": 5.76,
+     "text": "engine",
+     "prob": 0.89453125
+    },
+    {
+     "start": 5.76,
+     "end": 6.26,
+     "text": "start.",
+     "prob": 0.9677734375
+    },
+    {
+     "start": 6.56,
+     "end": 7.18,
+     "text": "Four,",
+     "prob": 0.7900390625
+    },
+    {
+     "start": 7.42,
+     "end": 7.78,
+     "text": "three,",
+     "prob": 0.98681640625
+    },
+    {
+     "start": 8.12,
+     "end": 8.58,
+     "text": "two,",
+     "prob": 0.9970703125
+    },
+    {
+     "start": 9.06,
+     "end": 9.56,
+     "text": "one.",
+     "prob": 0.99658203125
+    }
+   ]
+  },
+  {
+   "start": 22.740000000000002,
+   "end": 24.24,
+   "text": "You're a jerk, Tom.",
+   "words": [
+    {
+     "start": 22.740000000000002,
+     "end": 23.38,
+     "text": "You're",
+     "prob": 0.86767578125
+    },
+    {
+     "start": 23.38,
+     "end": 23.54,
+     "text": "a",
+     "prob": 0.99853515625
+    },
+    {
+     "start": 23.54,
+     "end": 23.94,
+     "text": "jerk,",
+     "prob": 0.998046875
+    },
+    {
+     "start": 24.1,
+     "end": 24.24,
+     "text": "Tom.",
+     "prob": 0.9658203125
+    }
+   ]
+  },
+  {
+   "start": 24.46,
+   "end": 26.84,
+   "text": "Look, Celia, we have to follow our passions.",
+   "words": [
+    {
+     "start": 24.46,
+     "end": 24.68,
+     "text": "Look,",
+     "prob": 0.98828125
+    },
+    {
+     "start": 24.9,
+     "end": 25.22,
+     "text": "Celia,",
+     "prob": 0.9970703125
+    },
+    {
+     "start": 25.36,
+     "end": 25.44,
+     "text": "we",
+     "prob": 0.99951171875
+    },
+    {
+     "start": 25.44,
+     "end": 25.64,
+     "text": "have",
+     "prob": 1.0
+    },
+    {
+     "start": 25.64,
+     "end": 25.78,
+     "text": "to",
+     "prob": 1.0
+    },
+    {
+     "start": 25.78,
+     "end": 26.08,
+     "text": "follow",
+     "prob": 1.0
+    },
+    {
+     "start": 26.08,
+     "end": 26.28,
+     "text": "our",
+     "prob": 0.99951171875
+    },
+    {
+     "start": 26.28,
+     "end": 26.84,
+     "text": "passions.",
+     "prob": 0.99853515625
+    }
+   ]
+  },
+  {
+   "start": 26.84,
+   "end": 29.94,
+   "text": "You have your robotics and I just want to be awesome in space.",
+   "words": [
+    {
+     "start": 26.84,
+     "end": 27.42,
+     "text": "You",
+     "prob": 0.9033203125
+    },
+    {
+     "start": 27.42,
+     "end": 27.58,
+     "text": "have",
+     "prob": 0.9775390625
+    },
+    {
+     "start": 27.58,
+     "end": 27.7,
+     "text": "your",
+     "prob": 0.98779296875
+    },
+    {
+     "start": 27.7,
+     "end": 28.2,
+     "text": "robotics",
+     "prob": 0.9921875
+    },
+    {
+     "start": 28.2,
+     "end": 28.36,
+     "text": "and",
+     "prob": 0.66162109375
+    },
+    {
+     "start": 28.36,
+     "end": 28.44,
+     "text": "I",
+     "prob": 0.9921875
+    },
+    {
+     "start": 28.44,
+     "end": 28.58,
+     "text": "just",
+     "prob": 0.97119140625
+    },
+    {
+     "start": 28.58,
+     "end": 28.74,
+     "text": "want",
+     "prob": 0.71240234375
+    },
+    {
+     "start": 28.74,
+     "end": 28.82,
+     "text": "to",
+     "prob": 0.99853515625
+    },
+    {
+     "start": 28.82,
+     "end": 28.94,
+     "text": "be",
+     "prob": 0.99755859375
+    },
+    {
+     "start": 28.94,
+     "end": 29.44,
+     "text": "awesome",
+     "prob": 0.99560546875
+    },
+    {
+     "start": 29.44,
+     "end": 29.62,
+     "text": "in",
+     "prob": 0.99267578125
+    },
+    {
+     "start": 29.62,
+     "end": 29.94,
+     "text": "space.",
+     "prob": 0.994140625
+    }
+   ]
+  },
+  {
+   "start": 30.32,
+   "end": 34.26,
+   "text": "Why don't you just admit that you're freaked out by my robot hand?",
+   "words": [
+    {
+     "start": 30.32,
+     "end": 30.8,
+     "text": "Why",
+     "prob": 0.8828125
+    },
+    {
+     "start": 30.8,
+     "end": 31.08,
+     "text": "don't",
+     "prob": 0.99658203125
+    },
+    {
+     "start": 31.08,
+     "end": 31.18,
+     "text": "you",
+     "prob": 0.99755859375
+    },
+    {
+     "start": 31.18,
+     "end": 31.4,
+     "text": "just",
+     "prob": 0.98974609375
+    },
+    {
+     "start": 31.4,
+     "end": 31.78,
+     "text": "admit",
+     "prob": 0.99267578125
+    },
+    {
+     "start": 31.78,
+     "end": 31.98,
+     "text": "that",
+     "prob": 0.97509765625
+    },
+    {
+     "start": 31.98,
+     "end": 32.24,
+     "text": "you're",
+     "prob": 0.96484375
+    },
+    {
+     "start": 32.24,
+     "end": 32.9,
+     "text": "freaked",
+     "prob": 0.9150390625
+    },
+    {
+     "start": 32.9,
+     "end": 33.1,
+     "text": "out",
+     "prob": 0.994140625
+    },
+    {
+     "start": 33.1,
+     "end": 33.3,
+     "text": "by",
+     "prob": 0.99169921875
+    },
+    {
+     "start": 33.3,
+     "end": 33.5,
+     "text": "my",
+     "prob": 0.99658203125
+    },
+    {
+     "start": 33.5,
+     "end": 33.94,
+     "text": "robot",
+     "prob": 0.98193359375
+    },
+    {
+     "start": 33.94,
+     "end": 34.26,
+     "text": "hand?",
+     "prob": 0.96875
+    }
+   ]
+  },
+  {
+   "start": 34.5,
+   "end": 35.9,
+   "text": "I'm not freaked out by it's...",
+   "words": [
+    {
+     "start": 34.5,
+     "end": 34.9,
+     "text": "I'm",
+     "prob": 0.9189453125
+    },
+    {
+     "start": 34.9,
+     "end": 35.02,
+     "text": "not",
+     "prob": 0.97412109375
+    },
+    {
+     "start": 35.02,
+     "end": 35.26,
+     "text": "freaked",
+     "prob": 0.99169921875
+    },
+    {
+     "start": 35.26,
+     "end": 35.44,
+     "text": "out",
+     "prob": 0.99365234375
+    },
+    {
+     "start": 35.44,
+     "end": 35.64,
+     "text": "by",
+     "prob": 0.7060546875
+    },
+    {
+     "start": 35.64,
+     "end": 35.9,
+     "text": "it's...",
+     "prob": 0.498291015625
+    }
+   ]
+  },
+  {
+   "start": 37.32,
+   "end": 42.28,
+   "text": "Alright, fine. I'm freaked out. I'm having nightmares that I'm being chased by this giant robotic claw.",
+   "words": [
+    {
+     "start": 37.32,
+     "end": 37.84,
+     "text": "Alright,",
+     "prob": 0.3837890625
+    },
+    {
+     "start": 38.02,
+     "end": 38.22,
+     "text": "fine.",
+     "prob": 0.994140625
+    },
+    {
+     "start": 38.52,
+     "end": 38.78,
+     "text": "I'm",
+     "prob": 0.99609375
+    },
+    {
+     "start": 38.78,
+     "end": 39.08,
+     "text": "freaked",
+     "prob": 0.99755859375
+    },
+    {
+     "start": 39.08,
+     "end": 39.36,
+     "text": "out.",
+     "prob": 0.99755859375
+    },
+    {
+     "start": 39.48,
+     "end": 39.56,
+     "text": "I'm",
+     "prob": 0.994140625
+    },
+    {
+     "start": 39.56,
+     "end": 39.72,
+     "text": "having",
+     "prob": 0.998046875
+    },
+    {
+     "start": 39.72,
+     "end": 40.1,
+     "text": "nightmares",
+     "prob": 0.99609375
+    },
+    {
+     "start": 40.1,
+     "end": 40.26,
+     "text": "that",
+     "prob": 0.97265625
+    },
+    {
+     "start": 40.26,
+     "end": 40.38,
+     "text": "I'm",
+     "prob": 0.99267578125
+    },
+    {
+     "start": 40.38,
+     "end": 40.5,
+     "text": "being",
+     "prob": 0.99462890625
+    },
+    {
+     "start": 40.5,
+     "end": 40.82,
+     "text": "chased",
+     "prob": 0.99755859375
+    },
+    {
+     "start": 40.82,
+     "end": 40.98,
+     "text": "by",
+     "prob": 0.9921875
+    },
+    {
+     "start": 40.98,
+     "end": 41.1,
+     "text": "this",
+     "prob": 0.52783203125
+    },
+    {
+     "start": 41.1,
+     "end": 41.44,
+     "text": "giant",
+     "prob": 0.9921875
+    },
+    {
+     "start": 41.44,
+     "end": 42.04,
+     "text": "robotic",
+     "prob": 0.95458984375
+    },
+    {
+     "start": 42.04,
+     "end": 42.28,
+     "text": "claw.",
+     "prob": 0.455078125
+    }
+   ]
+  },
+  {
+   "start": 42.38,
+   "end": 44.84,
+   "text": "Oh, whatever Tom. We're done.",
+   "words": [
+    {
+     "start": 42.38,
+     "end": 42.42,
+     "text": "Oh,",
+     "prob": 0.495361328125
+    },
+    {
+     "start": 42.42,
+     "end": 42.92,
+     "text": "whatever",
+     "prob": 0.7861328125
+    },
+    {
+     "start": 42.92,
+     "end": 43.28,
+     "text": "Tom.",
+     "prob": 0.484619140625
+    },
+    {
+     "start": 44.02,
+     "end": 44.54,
+     "text": "We're",
+     "prob": 0.9951171875
+    },
+    {
+     "start": 44.54,
+     "end": 44.84,
+     "text": "done.",
+     "prob": 0.99951171875
+    }
+   ]
+  },
+  {
+   "start": 50.0,
+   "end": 53.56,
+   "text": "Robots memories synced and locked.",
+   "words": [
+    {
+     "start": 50.0,
+     "end": 50.52,
+     "text": "Robots",
+     "prob": 0.56884765625
+    },
+    {
+     "start": 50.52,
+     "end": 50.86,
+     "text": "memories",
+     "prob": 0.431884765625
+    },
+    {
+     "start": 50.86,
+     "end": 51.64,
+     "text": "synced",
+     "prob": 0.9755859375
+    },
+    {
+     "start": 51.64,
+     "end": 52.56,
+     "text": "and",
+     "prob": 0.82421875
+    },
+    {
+     "start": 52.56,
+     "end": 53.56,
+     "text": "locked.",
+     "prob": 0.6162109375
+    }
+   ]
+  },
+  {
+   "start": 60.260000000000005,
+   "end": 62.2,
+   "text": "This is pretty freaky.",
+   "words": [
+    {
+     "start": 60.260000000000005,
+     "end": 61.1,
+     "text": "This",
+     "prob": 0.849609375
+    },
+    {
+     "start": 61.1,
+     "end": 61.28,
+     "text": "is",
+     "prob": 0.99072265625
+    },
+    {
+     "start": 61.28,
+     "end": 61.7,
+     "text": "pretty",
+     "prob": 0.994140625
+    },
+    {
+     "start": 61.7,
+     "end": 62.2,
+     "text": "freaky.",
+     "prob": 0.978515625
+    }
+   ]
+  },
+  {
+   "start": 117.48,
+   "end": 118.5,
+   "text": "Shouldn't you be down there?",
+   "words": [
+    {
+     "start": 117.48,
+     "end": 117.9,
+     "text": "Shouldn't",
+     "prob": 0.9208984375
+    },
+    {
+     "start": 117.9,
+     "end": 118.02,
+     "text": "you",
+     "prob": 0.99609375
+    },
+    {
+     "start": 118.02,
+     "end": 118.14,
+     "text": "be",
+     "prob": 0.9970703125
+    },
+    {
+     "start": 118.14,
+     "end": 118.32,
+     "text": "down",
+     "prob": 0.99853515625
+    },
+    {
+     "start": 118.32,
+     "end": 118.5,
+     "text": "there?",
+     "prob": 0.998046875
+    }
+   ]
+  },
+  {
+   "start": 130.98000000000002,
+   "end": 132.78,
+   "text": "I heard you guys talking last night.",
+   "words": [
+    {
+     "start": 130.98000000000002,
+     "end": 131.4,
+     "text": "I",
+     "prob": 0.96728515625
+    },
+    {
+     "start": 131.4,
+     "end": 131.58,
+     "text": "heard",
+     "prob": 0.9873046875
+    },
+    {
+     "start": 131.58,
+     "end": 131.68,
+     "text": "you",
+     "prob": 0.91845703125
+    },
+    {
+     "start": 131.68,
+     "end": 131.9,
+     "text": "guys",
+     "prob": 0.99853515625
+    },
+    {
+     "start": 131.9,
+     "end": 132.22,
+     "text": "talking",
+     "prob": 0.98974609375
+    },
+    {
+     "start": 132.22,
+     "end": 132.5,
+     "text": "last",
+     "prob": 0.99169921875
+    },
+    {
+     "start": 132.5,
+     "end": 132.78,
+     "text": "night.",
+     "prob": 0.99951171875
+    }
+   ]
+  },
+  {
+   "start": 136.16000000000003,
+   "end": 137.56,
+   "text": "It's not my fault, you know.",
+   "words": [
+    {
+     "start": 136.16000000000003,
+     "end": 136.58,
+     "text": "It's",
+     "prob": 0.97998046875
+    },
+    {
+     "start": 136.58,
+     "end": 136.72,
+     "text": "not",
+     "prob": 0.99853515625
+    },
+    {
+     "start": 136.72,
+     "end": 136.92,
+     "text": "my",
+     "prob": 0.99658203125
+    },
+    {
+     "start": 136.92,
+     "end": 137.26,
+     "text": "fault,",
+     "prob": 1.0
+    },
+    {
+     "start": 137.36,
+     "end": 137.46,
+     "text": "you",
+     "prob": 0.96337890625
+    },
+    {
+     "start": 137.46,
+     "end": 137.56,
+     "text": "know.",
+     "prob": 0.99951171875
+    }
+   ]
+  },
+  {
+   "start": 190.96,
+   "end": 194.44,
+   "text": "Are you ready? Of course you're ready. You're a rock star.",
+   "words": [
+    {
+     "start": 190.96,
+     "end": 191.52,
+     "text": "Are",
+     "prob": 0.81591796875
+    },
+    {
+     "start": 191.52,
+     "end": 191.64,
+     "text": "you",
+     "prob": 0.99853515625
+    },
+    {
+     "start": 191.64,
+     "end": 191.92,
+     "text": "ready?",
+     "prob": 0.9951171875
+    },
+    {
+     "start": 192.42,
+     "end": 192.98,
+     "text": "Of",
+     "prob": 0.8798828125
+    },
+    {
+     "start": 192.98,
+     "end": 192.98,
+     "text": "course",
+     "prob": 0.9931640625
+    },
+    {
+     "start": 192.98,
+     "end": 193.26,
+     "text": "you're",
+     "prob": 0.8798828125
+    },
+    {
+     "start": 193.26,
+     "end": 193.42,
+     "text": "ready.",
+     "prob": 0.99853515625
+    },
+    {
+     "start": 193.64,
+     "end": 193.8,
+     "text": "You're",
+     "prob": 0.98779296875
+    },
+    {
+     "start": 193.8,
+     "end": 193.9,
+     "text": "a",
+     "prob": 0.9970703125
+    },
+    {
+     "start": 193.9,
+     "end": 194.1,
+     "text": "rock",
+     "prob": 0.9716796875
+    },
+    {
+     "start": 194.1,
+     "end": 194.44,
+     "text": "star.",
+     "prob": 0.461181640625
+    }
+   ]
+  },
+  {
+   "start": 196.78,
+   "end": 198.1,
+   "text": "How's it looking, Barley?",
+   "words": [
+    {
+     "start": 196.78,
+     "end": 197.34,
+     "text": "How's",
+     "prob": 0.9365234375
+    },
+    {
+     "start": 197.34,
+     "end": 197.44,
+     "text": "it",
+     "prob": 0.984375
+    },
+    {
+     "start": 197.44,
+     "end": 197.7,
+     "text": "looking,",
+     "prob": 0.77783203125
+    },
+    {
+     "start": 197.84,
+     "end": 198.1,
+     "text": "Barley?",
+     "prob": 0.9296875
+    }
+   ]
+  },
+  {
+   "start": 198.44,
+   "end": 200.32,
+   "text": "We should have about 10 minutes.",
+   "words": [
+    {
+     "start": 198.44,
+     "end": 199.0,
+     "text": "We",
+     "prob": 0.96923828125
+    },
+    {
+     "start": 199.0,
+     "end": 199.28,
+     "text": "should",
+     "prob": 0.998046875
+    },
+    {
+     "start": 199.28,
+     "end": 199.52,
+     "text": "have",
+     "prob": 0.99853515625
+    },
+    {
+     "start": 199.52,
+     "end": 199.76,
+     "text": "about",
+     "prob": 0.99072265625
+    },
+    {
+     "start": 199.76,
+     "end": 200.02,
+     "text": "10",
+     "prob": 0.5224609375
+    },
+    {
+     "start": 200.02,
+     "end": 200.32,
+     "text": "minutes.",
+     "prob": 0.994140625
+    }
+   ]
+  },
+  {
+   "start": 201.38,
+   "end": 204.46,
+   "text": "Well, that's perfect. We're only one.",
+   "words": [
+    {
+     "start": 201.38,
+     "end": 201.94,
+     "text": "Well,",
+     "prob": 0.91259765625
+    },
+    {
+     "start": 202.06,
+     "end": 202.24,
+     "text": "that's",
+     "prob": 0.99853515625
+    },
+    {
+     "start": 202.24,
+     "end": 202.64,
+     "text": "perfect.",
+     "prob": 0.99853515625
+    },
+    {
+     "start": 203.44,
+     "end": 203.82,
+     "text": "We're",
+     "prob": 0.96484375
+    },
+    {
+     "start": 203.82,
+     "end": 204.12,
+     "text": "only",
+     "prob": 0.94775390625
+    },
+    {
+     "start": 204.12,
+     "end": 204.46,
+     "text": "one.",
+     "prob": 0.9892578125
+    }
+   ]
+  },
+  {
+   "start": 204.46,
+   "end": 207.38,
+   "text": "All systems go! Yeah, you, go!",
+   "words": [
+    {
+     "start": 204.46,
+     "end": 205.4,
+     "text": "All",
+     "prob": 0.56640625
+    },
+    {
+     "start": 205.4,
+     "end": 205.9,
+     "text": "systems",
+     "prob": 0.947265625
+    },
+    {
+     "start": 205.9,
+     "end": 206.42,
+     "text": "go!",
+     "prob": 0.8671875
+    },
+    {
+     "start": 206.56,
+     "end": 206.72,
+     "text": "Yeah,",
+     "prob": 0.7666015625
+    },
+    {
+     "start": 206.72,
+     "end": 206.94,
+     "text": "you,",
+     "prob": 0.9892578125
+    },
+    {
+     "start": 207.1,
+     "end": 207.38,
+     "text": "go!",
+     "prob": 0.9765625
+    }
+   ]
+  },
+  {
+   "start": 207.84,
+   "end": 208.22,
+   "text": "Go!",
+   "words": [
+    {
+     "start": 207.84,
+     "end": 208.22,
+     "text": "Go!",
+     "prob": 0.8603515625
+    }
+   ]
+  },
+  {
+   "start": 209.58,
+   "end": 211.94,
+   "text": "Move your asses! Go, go, go!",
+   "words": [
+    {
+     "start": 209.58,
+     "end": 210.24,
+     "text": "Move",
+     "prob": 0.767578125
+    },
+    {
+     "start": 210.24,
+     "end": 210.46,
+     "text": "your",
+     "prob": 0.97412109375
+    },
+    {
+     "start": 210.46,
+     "end": 211.04,
+     "text": "asses!",
+     "prob": 0.982421875
+    },
+    {
+     "start": 211.2,
+     "end": 211.38,
+     "text": "Go,",
+     "prob": 0.97607421875
+    },
+    {
+     "start": 211.48,
+     "end": 211.64,
+     "text": "go,",
+     "prob": 0.994140625
+    },
+    {
+     "start": 211.72,
+     "end": 211.94,
+     "text": "go!",
+     "prob": 0.9990234375
+    }
+   ]
+  },
+  {
+   "start": 212.58,
+   "end": 214.86,
+   "text": "I love it! Come on!",
+   "words": [
+    {
+     "start": 212.58,
+     "end": 213.24,
+     "text": "I",
+     "prob": 0.81591796875
+    },
+    {
+     "start": 213.24,
+     "end": 213.5,
+     "text": "love",
+     "prob": 0.98388671875
+    },
+    {
+     "start": 213.5,
+     "end": 213.96,
+     "text": "it!",
+     "prob": 0.955078125
+    },
+    {
+     "start": 214.18,
+     "end": 214.52,
+     "text": "Come",
+     "prob": 0.89013671875
+    },
+    {
+     "start": 214.52,
+     "end": 214.86,
+     "text": "on!",
+     "prob": 0.9970703125
+    }
+   ]
+  },
+  {
+   "start": 215.26,
+   "end": 215.68,
+   "text": "Go!",
+   "words": [
+    {
+     "start": 215.26,
+     "end": 215.68,
+     "text": "Go!",
+     "prob": 0.9326171875
+    }
+   ]
+  },
+  {
+   "start": 222.56,
+   "end": 225.86,
+   "text": "That's nice. Nothing to worry about. Tom!",
+   "words": [
+    {
+     "start": 222.56,
+     "end": 223.22,
+     "text": "That's",
+     "prob": 0.95947265625
+    },
+    {
+     "start": 223.22,
+     "end": 223.62,
+     "text": "nice.",
+     "prob": 0.9990234375
+    },
+    {
+     "start": 224.22,
+     "end": 224.88,
+     "text": "Nothing",
+     "prob": 0.94970703125
+    },
+    {
+     "start": 224.88,
+     "end": 225.1,
+     "text": "to",
+     "prob": 0.9990234375
+    },
+    {
+     "start": 225.1,
+     "end": 225.28,
+     "text": "worry",
+     "prob": 0.99951171875
+    },
+    {
+     "start": 225.28,
+     "end": 225.52,
+     "text": "about.",
+     "prob": 0.9990234375
+    },
+    {
+     "start": 225.66,
+     "end": 225.86,
+     "text": "Tom!",
+     "prob": 0.71923828125
+    }
+   ]
+  },
+  {
+   "start": 230.26,
+   "end": 232.74,
+   "text": "Tom, there she is.",
+   "words": [
+    {
+     "start": 230.26,
+     "end": 230.92,
+     "text": "Tom,",
+     "prob": 0.953125
+    },
+    {
+     "start": 231.98,
+     "end": 232.26,
+     "text": "there",
+     "prob": 0.994140625
+    },
+    {
+     "start": 232.26,
+     "end": 232.44,
+     "text": "she",
+     "prob": 0.9990234375
+    },
+    {
+     "start": 232.44,
+     "end": 232.74,
+     "text": "is.",
+     "prob": 1.0
+    }
+   ]
+  },
+  {
+   "start": 232.74,
+   "end": 236.22,
+   "text": "Now, you love her.",
+   "words": [
+    {
+     "start": 232.74,
+     "end": 233.88,
+     "text": "Now,",
+     "prob": 0.6728515625
+    },
+    {
+     "start": 235.38,
+     "end": 235.56,
+     "text": "you",
+     "prob": 0.9658203125
+    },
+    {
+     "start": 235.56,
+     "end": 236.02,
+     "text": "love",
+     "prob": 0.806640625
+    },
+    {
+     "start": 236.02,
+     "end": 236.22,
+     "text": "her.",
+     "prob": 0.99755859375
+    }
+   ]
+  },
+  {
+   "start": 236.9,
+   "end": 238.36,
+   "text": "She's your passion.",
+   "words": [
+    {
+     "start": 236.9,
+     "end": 237.72,
+     "text": "She's",
+     "prob": 0.8818359375
+    },
+    {
+     "start": 237.72,
+     "end": 237.82,
+     "text": "your",
+     "prob": 0.99658203125
+    },
+    {
+     "start": 237.82,
+     "end": 238.36,
+     "text": "passion.",
+     "prob": 0.99853515625
+    }
+   ]
+  },
+  {
+   "start": 238.94,
+   "end": 240.52,
+   "text": "Be tender to her.",
+   "words": [
+    {
+     "start": 238.94,
+     "end": 239.26,
+     "text": "Be",
+     "prob": 0.9931640625
+    },
+    {
+     "start": 239.26,
+     "end": 240.12,
+     "text": "tender",
+     "prob": 0.8955078125
+    },
+    {
+     "start": 240.12,
+     "end": 240.36,
+     "text": "to",
+     "prob": 0.9990234375
+    },
+    {
+     "start": 240.36,
+     "end": 240.52,
+     "text": "her.",
+     "prob": 0.99951171875
+    }
+   ]
+  },
+  {
+   "start": 241.02,
+   "end": 241.98,
+   "text": "Be honest.",
+   "words": [
+    {
+     "start": 241.02,
+     "end": 241.62,
+     "text": "Be",
+     "prob": 0.99951171875
+    },
+    {
+     "start": 241.62,
+     "end": 241.98,
+     "text": "honest.",
+     "prob": 0.9990234375
+    }
+   ]
+  },
+  {
+   "start": 242.94,
+   "end": 244.14,
+   "text": "Be tender.",
+   "words": [
+    {
+     "start": 242.94,
+     "end": 243.84,
+     "text": "Be",
+     "prob": 0.99755859375
+    },
+    {
+     "start": 243.84,
+     "end": 244.14,
+     "text": "tender.",
+     "prob": 0.99951171875
+    }
+   ]
+  },
+  {
+   "start": 245.06,
+   "end": 247.86,
+   "text": "Remind her what love is.",
+   "words": [
+    {
+     "start": 245.06,
+     "end": 246.06,
+     "text": "Remind",
+     "prob": 0.9912109375
+    },
+    {
+     "start": 246.06,
+     "end": 246.24,
+     "text": "her",
+     "prob": 0.99951171875
+    },
+    {
+     "start": 246.24,
+     "end": 247.2,
+     "text": "what",
+     "prob": 0.984375
+    },
+    {
+     "start": 247.2,
+     "end": 247.52,
+     "text": "love",
+     "prob": 0.99951171875
+    },
+    {
+     "start": 247.52,
+     "end": 247.86,
+     "text": "is.",
+     "prob": 1.0
+    }
+   ]
+  },
+  {
+   "start": 292.57000000000005,
+   "end": 293.73,
+   "text": "And...",
+   "words": [
+    {
+     "start": 292.57000000000005,
+     "end": 293.73,
+     "text": "And...",
+     "prob": 0.65771484375
+    }
+   ]
+  },
+  {
+   "start": 293.73,
+   "end": 294.73,
+   "text": "Action!",
+   "words": [
+    {
+     "start": 293.73,
+     "end": 294.73,
+     "text": "Action!",
+     "prob": 0.38330078125
+    }
+   ]
+  },
+  {
+   "start": 295.85,
+   "end": 298.11,
+   "text": "Memory override in progress.",
+   "words": [
+    {
+     "start": 295.85,
+     "end": 297.01000000000005,
+     "text": "Memory",
+     "prob": 0.8408203125
+    },
+    {
+     "start": 297.01000000000005,
+     "end": 297.47,
+     "text": "override",
+     "prob": 0.8974609375
+    },
+    {
+     "start": 297.47,
+     "end": 297.67,
+     "text": "in",
+     "prob": 0.9326171875
+    },
+    {
+     "start": 297.67,
+     "end": 298.11,
+     "text": "progress.",
+     "prob": 0.99462890625
+    }
+   ]
+  },
+  {
+   "start": 298.93,
+   "end": 300.43,
+   "text": "You're a jerk, Tom!",
+   "words": [
+    {
+     "start": 298.93,
+     "end": 299.57000000000005,
+     "text": "You're",
+     "prob": 0.8701171875
+    },
+    {
+     "start": 299.57000000000005,
+     "end": 299.63,
+     "text": "a",
+     "prob": 0.59375
+    },
+    {
+     "start": 299.63,
+     "end": 300.01000000000005,
+     "text": "jerk,",
+     "prob": 0.9970703125
+    },
+    {
+     "start": 300.21000000000004,
+     "end": 300.43,
+     "text": "Tom!",
+     "prob": 0.402587890625
+    }
+   ]
+  },
+  {
+   "start": 301.71000000000004,
+   "end": 304.03000000000003,
+   "text": "Oh, I'm sorry! Sorry.",
+   "words": [
+    {
+     "start": 301.71000000000004,
+     "end": 302.37,
+     "text": "Oh,",
+     "prob": 0.80419921875
+    },
+    {
+     "start": 302.37,
+     "end": 302.57000000000005,
+     "text": "I'm",
+     "prob": 0.9306640625
+    },
+    {
+     "start": 302.57000000000005,
+     "end": 302.85,
+     "text": "sorry!",
+     "prob": 0.99755859375
+    },
+    {
+     "start": 303.25,
+     "end": 304.03000000000003,
+     "text": "Sorry.",
+     "prob": 0.9638671875
+    }
+   ]
+  },
+  {
+   "start": 304.81,
+   "end": 305.33000000000004,
+   "text": "Sorry.",
+   "words": [
+    {
+     "start": 304.81,
+     "end": 305.33000000000004,
+     "text": "Sorry.",
+     "prob": 0.7255859375
+    }
+   ]
+  },
+  {
+   "start": 315.51000000000005,
+   "end": 320.01000000000005,
+   "text": "Look Celia, we have to follow our passions.",
+   "words": [
+    {
+     "start": 315.51000000000005,
+     "end": 316.19,
+     "text": "Look",
+     "prob": 0.8466796875
+    },
+    {
+     "start": 316.19,
+     "end": 316.65000000000003,
+     "text": "Celia,",
+     "prob": 0.751953125
+    },
+    {
+     "start": 316.83000000000004,
+     "end": 318.47,
+     "text": "we",
+     "prob": 0.853515625
+    },
+    {
+     "start": 318.47,
+     "end": 318.69,
+     "text": "have",
+     "prob": 0.99853515625
+    },
+    {
+     "start": 318.69,
+     "end": 318.85,
+     "text": "to",
+     "prob": 0.99951171875
+    },
+    {
+     "start": 318.85,
+     "end": 319.19,
+     "text": "follow",
+     "prob": 0.9990234375
+    },
+    {
+     "start": 319.19,
+     "end": 319.45000000000005,
+     "text": "our",
+     "prob": 0.99853515625
+    },
+    {
+     "start": 319.45000000000005,
+     "end": 320.01000000000005,
+     "text": "passions.",
+     "prob": 0.9873046875
+    }
+   ]
+  },
+  {
+   "start": 321.17,
+   "end": 327.55,
+   "text": "You have your robotics, and I just want to be awesome in space.",
+   "words": [
+    {
+     "start": 321.17,
+     "end": 321.51,
+     "text": "You",
+     "prob": 0.99072265625
+    },
+    {
+     "start": 321.51,
+     "end": 321.71000000000004,
+     "text": "have",
+     "prob": 0.99951171875
+    },
+    {
+     "start": 321.71000000000004,
+     "end": 321.89000000000004,
+     "text": "your",
+     "prob": 0.99560546875
+    },
+    {
+     "start": 321.89000000000004,
+     "end": 322.49,
+     "text": "robotics,",
+     "prob": 0.98974609375
+    },
+    {
+     "start": 322.57000000000005,
+     "end": 325.27000000000004,
+     "text": "and",
+     "prob": 0.92041015625
+    },
+    {
+     "start": 325.27000000000004,
+     "end": 325.97,
+     "text": "I",
+     "prob": 0.916015625
+    },
+    {
+     "start": 325.97,
+     "end": 326.19000000000005,
+     "text": "just",
+     "prob": 0.99658203125
+    },
+    {
+     "start": 326.19000000000005,
+     "end": 326.39000000000004,
+     "text": "want",
+     "prob": 0.755859375
+    },
+    {
+     "start": 326.39000000000004,
+     "end": 326.49,
+     "text": "to",
+     "prob": 0.9990234375
+    },
+    {
+     "start": 326.49,
+     "end": 326.63,
+     "text": "be",
+     "prob": 0.99658203125
+    },
+    {
+     "start": 326.63,
+     "end": 326.99,
+     "text": "awesome",
+     "prob": 0.998046875
+    },
+    {
+     "start": 326.99,
+     "end": 327.19000000000005,
+     "text": "in",
+     "prob": 0.99658203125
+    },
+    {
+     "start": 327.19000000000005,
+     "end": 327.55,
+     "text": "space.",
+     "prob": 0.99169921875
+    }
+   ]
+  },
+  {
+   "start": 338.67,
+   "end": 341.01,
+   "text": "Get her coming. Two minutes left.",
+   "words": [
+    {
+     "start": 338.67,
+     "end": 339.27000000000004,
+     "text": "Get",
+     "prob": 0.2369384765625
+    },
+    {
+     "start": 339.27000000000004,
+     "end": 339.39000000000004,
+     "text": "her",
+     "prob": 0.6005859375
+    },
+    {
+     "start": 339.39000000000004,
+     "end": 339.69000000000005,
+     "text": "coming.",
+     "prob": 0.78076171875
+    },
+    {
+     "start": 340.05,
+     "end": 340.47,
+     "text": "Two",
+     "prob": 0.8974609375
+    },
+    {
+     "start": 340.47,
+     "end": 340.71000000000004,
+     "text": "minutes",
+     "prob": 0.984375
+    },
+    {
+     "start": 340.71000000000004,
+     "end": 341.01,
+     "text": "left.",
+     "prob": 0.99658203125
+    }
+   ]
+  },
+  {
+   "start": 341.25,
+   "end": 341.93,
+   "text": "Two minutes.",
+   "words": [
+    {
+     "start": 341.25,
+     "end": 341.59000000000003,
+     "text": "Two",
+     "prob": 0.77783203125
+    },
+    {
+     "start": 341.59000000000003,
+     "end": 341.93,
+     "text": "minutes.",
+     "prob": 0.98681640625
+    }
+   ]
+  },
+  {
+   "start": 346.49,
+   "end": 349.85,
+   "text": "Why don't you just admit that you're freaked out by my robot hand?",
+   "words": [
+    {
+     "start": 346.49,
+     "end": 347.09000000000003,
+     "text": "Why",
+     "prob": 0.2249755859375
+    },
+    {
+     "start": 347.09000000000003,
+     "end": 347.37,
+     "text": "don't",
+     "prob": 0.98876953125
+    },
+    {
+     "start": 347.37,
+     "end": 347.47,
+     "text": "you",
+     "prob": 0.99658203125
+    },
+    {
+     "start": 347.47,
+     "end": 347.67,
+     "text": "just",
+     "prob": 0.9892578125
+    },
+    {
+     "start": 347.67,
+     "end": 347.99,
+     "text": "admit",
+     "prob": 0.9951171875
+    },
+    {
+     "start": 347.99,
+     "end": 348.15000000000003,
+     "text": "that",
+     "prob": 0.59814453125
+    },
+    {
+     "start": 348.15000000000003,
+     "end": 348.33000000000004,
+     "text": "you're",
+     "prob": 0.9462890625
+    },
+    {
+     "start": 348.33000000000004,
+     "end": 348.63,
+     "text": "freaked",
+     "prob": 0.99462890625
+    },
+    {
+     "start": 348.63,
+     "end": 348.81,
+     "text": "out",
+     "prob": 0.99267578125
+    },
+    {
+     "start": 348.81,
+     "end": 348.99,
+     "text": "by",
+     "prob": 0.98828125
+    },
+    {
+     "start": 348.99,
+     "end": 349.19000000000005,
+     "text": "my",
+     "prob": 0.990234375
+    },
+    {
+     "start": 349.19000000000005,
+     "end": 349.53000000000003,
+     "text": "robot",
+     "prob": 0.99462890625
+    },
+    {
+     "start": 349.53000000000003,
+     "end": 349.85,
+     "text": "hand?",
+     "prob": 0.98583984375
+    }
+   ]
+  },
+  {
+   "start": 356.47,
+   "end": 358.75,
+   "text": "Listen, Celia. I was young.",
+   "words": [
+    {
+     "start": 356.47,
+     "end": 357.07000000000005,
+     "text": "Listen,",
+     "prob": 0.96923828125
+    },
+    {
+     "start": 357.25,
+     "end": 357.53000000000003,
+     "text": "Celia.",
+     "prob": 0.87890625
+    },
+    {
+     "start": 357.81,
+     "end": 358.23,
+     "text": "I",
+     "prob": 0.99658203125
+    },
+    {
+     "start": 358.23,
+     "end": 358.43,
+     "text": "was",
+     "prob": 0.9990234375
+    },
+    {
+     "start": 358.43,
+     "end": 358.75,
+     "text": "young.",
+     "prob": 0.99755859375
+    }
+   ]
+  },
+  {
+   "start": 359.51000000000005,
+   "end": 360.55,
+   "text": "And a dick.",
+   "words": [
+    {
+     "start": 359.51000000000005,
+     "end": 360.11,
+     "text": "And",
+     "prob": 0.970703125
+    },
+    {
+     "start": 360.11,
+     "end": 360.29,
+     "text": "a",
+     "prob": 0.99609375
+    },
+    {
+     "start": 360.29,
+     "end": 360.55,
+     "text": "dick.",
+     "prob": 0.96728515625
+    }
+   ]
+  },
+  {
+   "start": 360.93,
+   "end": 362.83000000000004,
+   "text": "But there's no reason to destroy the world.",
+   "words": [
+    {
+     "start": 360.93,
+     "end": 361.31,
+     "text": "But",
+     "prob": 0.9892578125
+    },
+    {
+     "start": 361.31,
+     "end": 361.47,
+     "text": "there's",
+     "prob": 0.9677734375
+    },
+    {
+     "start": 361.47,
+     "end": 361.59000000000003,
+     "text": "no",
+     "prob": 0.998046875
+    },
+    {
+     "start": 361.59000000000003,
+     "end": 361.81,
+     "text": "reason",
+     "prob": 0.9990234375
+    },
+    {
+     "start": 361.81,
+     "end": 361.95000000000005,
+     "text": "to",
+     "prob": 0.998046875
+    },
+    {
+     "start": 361.95000000000005,
+     "end": 362.27000000000004,
+     "text": "destroy",
+     "prob": 0.99755859375
+    },
+    {
+     "start": 362.27000000000004,
+     "end": 362.49,
+     "text": "the",
+     "prob": 0.9990234375
+    },
+    {
+     "start": 362.49,
+     "end": 362.83000000000004,
+     "text": "world.",
+     "prob": 0.998046875
+    }
+   ]
+  },
+  {
+   "start": 364.35,
+   "end": 365.77000000000004,
+   "text": "Why does he do this?",
+   "words": [
+    {
+     "start": 364.35,
+     "end": 365.15000000000003,
+     "text": "Why",
+     "prob": 0.8466796875
+    },
+    {
+     "start": 365.15000000000003,
+     "end": 365.29,
+     "text": "does",
+     "prob": 0.796875
+    },
+    {
+     "start": 365.29,
+     "end": 365.39000000000004,
+     "text": "he",
+     "prob": 0.55419921875
+    },
+    {
+     "start": 365.39000000000004,
+     "end": 365.51,
+     "text": "do",
+     "prob": 0.99853515625
+    },
+    {
+     "start": 365.51,
+     "end": 365.77000000000004,
+     "text": "this?",
+     "prob": 0.99755859375
+    }
+   ]
+  },
+  {
+   "start": 366.65000000000003,
+   "end": 368.53000000000003,
+   "text": "We already tried that one.",
+   "words": [
+    {
+     "start": 366.65000000000003,
+     "end": 367.21000000000004,
+     "text": "We",
+     "prob": 0.9560546875
+    },
+    {
+     "start": 367.21000000000004,
+     "end": 367.55,
+     "text": "already",
+     "prob": 0.97900390625
+    },
+    {
+     "start": 367.55,
+     "end": 367.95000000000005,
+     "text": "tried",
+     "prob": 0.951171875
+    },
+    {
+     "start": 367.95000000000005,
+     "end": 368.13,
+     "text": "that",
+     "prob": 0.7734375
+    },
+    {
+     "start": 368.13,
+     "end": 368.53000000000003,
+     "text": "one.",
+     "prob": 0.9970703125
+    }
+   ]
+  },
+  {
+   "start": 371.65000000000003,
+   "end": 372.45000000000005,
+   "text": "Abort!",
+   "words": [
+    {
+     "start": 371.65000000000003,
+     "end": 372.45000000000005,
+     "text": "Abort!",
+     "prob": 0.8154296875
+    }
+   ]
+  },
+  {
+   "start": 373.29,
+   "end": 373.73,
+   "text": "Fuck!",
+   "words": [
+    {
+     "start": 373.29,
+     "end": 373.73,
+     "text": "Fuck!",
+     "prob": 0.25244140625
+    }
+   ]
+  },
+  {
+   "start": 374.19000000000005,
+   "end": 374.45000000000005,
+   "text": "Whoa!",
+   "words": [
+    {
+     "start": 374.19000000000005,
+     "end": 374.45000000000005,
+     "text": "Whoa!",
+     "prob": 0.08203125
+    }
+   ]
+  },
+  {
+   "start": 378.65000000000003,
+   "end": 379.45000000000005,
+   "text": "No!",
+   "words": [
+    {
+     "start": 378.65000000000003,
+     "end": 379.45000000000005,
+     "text": "No!",
+     "prob": 0.8447265625
+    }
+   ]
+  },
+  {
+   "start": 380.37,
+   "end": 381.13,
+   "text": "No!",
+   "words": [
+    {
+     "start": 380.37,
+     "end": 381.13,
+     "text": "No!",
+     "prob": 0.8984375
+    }
+   ]
+  },
+  {
+   "start": 382.91,
+   "end": 384.83000000000004,
+   "text": "You broke my heart.",
+   "words": [
+    {
+     "start": 382.91,
+     "end": 383.71000000000004,
+     "text": "You",
+     "prob": 0.91796875
+    },
+    {
+     "start": 383.71000000000004,
+     "end": 384.17,
+     "text": "broke",
+     "prob": 0.9970703125
+    },
+    {
+     "start": 384.17,
+     "end": 384.43,
+     "text": "my",
+     "prob": 0.99951171875
+    },
+    {
+     "start": 384.43,
+     "end": 384.83000000000004,
+     "text": "heart.",
+     "prob": 0.9990234375
+    }
+   ]
+  },
+  {
+   "start": 385.79,
+   "end": 386.39000000000004,
+   "text": "I know.",
+   "words": [
+    {
+     "start": 385.79,
+     "end": 386.19000000000005,
+     "text": "I",
+     "prob": 0.966796875
+    },
+    {
+     "start": 386.19000000000005,
+     "end": 386.39000000000004,
+     "text": "know.",
+     "prob": 0.9990234375
+    }
+   ]
+  },
+  {
+   "start": 386.75,
+   "end": 388.47,
+   "text": "You forgot me on Earth.",
+   "words": [
+    {
+     "start": 386.75,
+     "end": 387.29,
+     "text": "You",
+     "prob": 0.9970703125
+    },
+    {
+     "start": 387.29,
+     "end": 387.67,
+     "text": "forgot",
+     "prob": 0.99658203125
+    },
+    {
+     "start": 387.67,
+     "end": 388.01,
+     "text": "me",
+     "prob": 0.99853515625
+    },
+    {
+     "start": 388.01,
+     "end": 388.27000000000004,
+     "text": "on",
+     "prob": 0.9990234375
+    },
+    {
+     "start": 388.27000000000004,
+     "end": 388.47,
+     "text": "Earth.",
+     "prob": 0.62158203125
+    }
+   ]
+  },
+  {
+   "start": 389.15000000000003,
+   "end": 389.63,
+   "text": "I know.",
+   "words": [
+    {
+     "start": 389.15000000000003,
+     "end": 389.47,
+     "text": "I",
+     "prob": 0.98876953125
+    },
+    {
+     "start": 389.47,
+     "end": 389.63,
+     "text": "know.",
+     "prob": 0.9814453125
+    }
+   ]
+  },
+  {
+   "start": 390.07000000000005,
+   "end": 392.09000000000003,
+   "text": "I should just crush you.",
+   "words": [
+    {
+     "start": 390.07000000000005,
+     "end": 390.63,
+     "text": "I",
+     "prob": 0.9951171875
+    },
+    {
+     "start": 390.63,
+     "end": 390.91,
+     "text": "should",
+     "prob": 0.99609375
+    },
+    {
+     "start": 390.91,
+     "end": 391.27000000000004,
+     "text": "just",
+     "prob": 0.99951171875
+    },
+    {
+     "start": 391.27000000000004,
+     "end": 391.77000000000004,
+     "text": "crush",
+     "prob": 0.81640625
+    },
+    {
+     "start": 391.77000000000004,
+     "end": 392.09000000000003,
+     "text": "you.",
+     "prob": 0.99853515625
+    }
+   ]
+  },
+  {
+   "start": 392.09000000000003,
+   "end": 392.33000000000004,
+   "text": "No!",
+   "words": [
+    {
+     "start": 392.09000000000003,
+     "end": 392.33000000000004,
+     "text": "No!",
+     "prob": 0.223876953125
+    }
+   ]
+  },
+  {
+   "start": 396.93,
+   "end": 397.63,
+   "text": "I'm...",
+   "words": [
+    {
+     "start": 396.93,
+     "end": 397.63,
+     "text": "I'm...",
+     "prob": 0.7646484375
+    }
+   ]
+  },
+  {
+   "start": 409.91,
+   "end": 410.89000000000004,
+   "text": "Who'd ad-lib?",
+   "words": [
+    {
+     "start": 409.91,
+     "end": 410.61,
+     "text": "Who'd",
+     "prob": 0.6787109375
+    },
+    {
+     "start": 410.61,
+     "end": 410.71000000000004,
+     "text": "ad",
+     "prob": 0.33984375
+    },
+    {
+     "start": 410.71000000000004,
+     "end": 410.89000000000004,
+     "text": "-lib?",
+     "prob": 0.77783203125
+    }
+   ]
+  },
+  {
+   "start": 418.75,
+   "end": 419.95000000000005,
+   "text": "Got my ball!",
+   "words": [
+    {
+     "start": 418.75,
+     "end": 419.45000000000005,
+     "text": "Got",
+     "prob": 0.271728515625
+    },
+    {
+     "start": 419.45000000000005,
+     "end": 419.59000000000003,
+     "text": "my",
+     "prob": 0.99658203125
+    },
+    {
+     "start": 419.59000000000003,
+     "end": 419.95000000000005,
+     "text": "ball!",
+     "prob": 0.83837890625
+    }
+   ]
+  },
+  {
+   "start": 422.09000000000003,
+   "end": 422.73,
+   "text": "This time.",
+   "words": [
+    {
+     "start": 422.09000000000003,
+     "end": 422.49,
+     "text": "This",
+     "prob": 0.52783203125
+    },
+    {
+     "start": 422.49,
+     "end": 422.73,
+     "text": "time.",
+     "prob": 0.99658203125
+    }
+   ]
+  },
+  {
+   "start": 428.33000000000004,
+   "end": 429.23,
+   "text": "Quiet outside.",
+   "words": [
+    {
+     "start": 428.33000000000004,
+     "end": 428.83000000000004,
+     "text": "Quiet",
+     "prob": 0.36328125
+    },
+    {
+     "start": 428.83000000000004,
+     "end": 429.23,
+     "text": "outside.",
+     "prob": 0.333984375
+    }
+   ]
+  },
+  {
+   "start": 429.89,
+   "end": 431.33000000000004,
+   "text": "We're out of time, we're out of time!",
+   "words": [
+    {
+     "start": 429.89,
+     "end": 430.39,
+     "text": "We're",
+     "prob": 0.92578125
+    },
+    {
+     "start": 430.39,
+     "end": 430.45000000000005,
+     "text": "out",
+     "prob": 0.95458984375
+    },
+    {
+     "start": 430.45000000000005,
+     "end": 430.57000000000005,
+     "text": "of",
+     "prob": 0.99658203125
+    },
+    {
+     "start": 430.57000000000005,
+     "end": 430.73,
+     "text": "time,",
+     "prob": 0.99755859375
+    },
+    {
+     "start": 430.83000000000004,
+     "end": 430.95000000000005,
+     "text": "we're",
+     "prob": 0.982421875
+    },
+    {
+     "start": 430.95000000000005,
+     "end": 430.99,
+     "text": "out",
+     "prob": 0.99853515625
+    },
+    {
+     "start": 430.99,
+     "end": 431.07000000000005,
+     "text": "of",
+     "prob": 0.99951171875
+    },
+    {
+     "start": 431.07000000000005,
+     "end": 431.33000000000004,
+     "text": "time!",
+     "prob": 0.99951171875
+    }
+   ]
+  },
+  {
+   "start": 518.61,
+   "end": 520.37,
+   "text": "The world's changed, Celia.",
+   "words": [
+    {
+     "start": 518.61,
+     "end": 519.29,
+     "text": "The",
+     "prob": 0.90185546875
+    },
+    {
+     "start": 519.29,
+     "end": 519.63,
+     "text": "world's",
+     "prob": 0.9541015625
+    },
+    {
+     "start": 519.63,
+     "end": 519.9300000000001,
+     "text": "changed,",
+     "prob": 0.99462890625
+    },
+    {
+     "start": 520.03,
+     "end": 520.37,
+     "text": "Celia.",
+     "prob": 0.982421875
+    }
+   ]
+  },
+  {
+   "start": 534.63,
+   "end": 535.9300000000001,
+   "text": "Maybe we can too.",
+   "words": [
+    {
+     "start": 534.63,
+     "end": 535.3100000000001,
+     "text": "Maybe",
+     "prob": 0.95849609375
+    },
+    {
+     "start": 535.3100000000001,
+     "end": 535.51,
+     "text": "we",
+     "prob": 0.96826171875
+    },
+    {
+     "start": 535.51,
+     "end": 535.69,
+     "text": "can",
+     "prob": 0.99755859375
+    },
+    {
+     "start": 535.69,
+     "end": 535.9300000000001,
+     "text": "too.",
+     "prob": 0.6416015625
+    }
+   ]
+  },
+  {
+   "start": 537.77,
+   "end": 539.23,
+   "text": "Memory override complete!",
+   "words": [
+    {
+     "start": 537.77,
+     "end": 538.45,
+     "text": "Memory",
+     "prob": 0.97021484375
+    },
+    {
+     "start": 538.45,
+     "end": 538.79,
+     "text": "override",
+     "prob": 0.97412109375
+    },
+    {
+     "start": 538.79,
+     "end": 539.23,
+     "text": "complete!",
+     "prob": 0.9892578125
+    }
+   ]
+  },
+  {
+   "start": 558.73,
+   "end": 563.55,
+   "text": "You know, there's a lesson to be learned from this.",
+   "words": [
+    {
+     "start": 558.73,
+     "end": 559.23,
+     "text": "You",
+     "prob": 0.87451171875
+    },
+    {
+     "start": 559.23,
+     "end": 559.4300000000001,
+     "text": "know,",
+     "prob": 0.99609375
+    },
+    {
+     "start": 559.6700000000001,
+     "end": 562.1700000000001,
+     "text": "there's",
+     "prob": 0.767578125
+    },
+    {
+     "start": 562.1700000000001,
+     "end": 562.27,
+     "text": "a",
+     "prob": 0.9951171875
+    },
+    {
+     "start": 562.27,
+     "end": 562.53,
+     "text": "lesson",
+     "prob": 0.9951171875
+    },
+    {
+     "start": 562.53,
+     "end": 562.69,
+     "text": "to",
+     "prob": 0.994140625
+    },
+    {
+     "start": 562.69,
+     "end": 562.8900000000001,
+     "text": "be",
+     "prob": 0.95654296875
+    },
+    {
+     "start": 562.8900000000001,
+     "end": 563.01,
+     "text": "learned",
+     "prob": 0.8837890625
+    },
+    {
+     "start": 563.01,
+     "end": 563.19,
+     "text": "from",
+     "prob": 0.9951171875
+    },
+    {
+     "start": 563.19,
+     "end": 563.55,
+     "text": "this.",
+     "prob": 0.99853515625
+    }
+   ]
+  },
+  {
+   "start": 565.71,
+   "end": 566.75,
+   "text": "Coulda gone worse.",
+   "words": [
+    {
+     "start": 565.71,
+     "end": 566.21,
+     "text": "Coulda",
+     "prob": 0.43603515625
+    },
+    {
+     "start": 566.21,
+     "end": 566.45,
+     "text": "gone",
+     "prob": 0.125244140625
+    },
+    {
+     "start": 566.45,
+     "end": 566.75,
+     "text": "worse.",
+     "prob": 0.8642578125
+    }
+   ]
+  }
+ ]
+}

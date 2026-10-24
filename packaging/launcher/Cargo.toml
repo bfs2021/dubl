@@ -1,0 +1,19 @@
+[package]
+name = "dubl-launcher"
+version = "0.1.0"
+edition = "2021"
+description = "Sidecar-обёртка Tauri: находит папку engine/ в ресурсах приложения и запускает из неё движок"
+publish = false
+
+[[bin]]
+name = "dubl-engine"
+path = "src/main.rs"
+
+[dependencies]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
