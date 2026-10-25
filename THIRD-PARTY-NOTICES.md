@@ -242,6 +242,10 @@
 
 Полный список: `cd app/src-tauri && cargo metadata --locked --format-version 1`.
 
+## Материалы документации
+
+Скриншоты в `docs/screenshots/` сняты на свободном фильме «Sintel» (2010), © Blender Foundation | durian.blender.org, лицензия [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). Кадры уменьшены и показаны внутри окна программы; русские реплики и дубли на них не из фильма, их написали и озвучили для примера. Тестовые видео Tears of Steel (© Blender Foundation | mango.blender.org, CC BY 3.0) и Cosmos Laundromat (© Blender Foundation, CC BY 4.0) в репозиторий не входят.
+
 ## Как обновить этот файл
 
 - Python: взять окружение с `dubl-engine[ml]` и вывести лицензии через `importlib.metadata` или `pip-licenses --with-urls --format=markdown`.
