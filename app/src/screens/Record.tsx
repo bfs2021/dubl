@@ -16,8 +16,9 @@ import { Help } from "../components/Help";
 import { sliceByScene, takeWindow } from "../audio/takes";
 import { RATE_COMFORT, RATE_MAX, countSyllables, fmtRate, syllableBudget, type BudgetLevel } from "../lib/syllables";
 import { REHEARSAL_TEXT, rehearsalPlan, type RehearsalStep } from "../lib/rehearsal";
-import { CLIPPED_TEXT, EMPTY_TEXT, isClipped, isFileTake, starReason, textReview, visibleRemark, type TakeX } from "../lib/takeReview";
+import { CLIPPED_TEXT, EMPTY_TEXT, QUIET_TEXT, isClipped, isFileTake, isQuiet, starReason, textReview, visibleRemark, type TakeX } from "../lib/takeReview";
 import { MicCheck } from "../components/MicCheck";
+import { TakeShift } from "../components/TakeShift";
 import { profileSummary, hasMicProfile } from "../lib/micProfile";
 import { fmtNum, fmtRel, fmtSec, plural } from "../lib/format";
 import { takeCaption } from "../lib/director";
@@ -533,7 +534,7 @@ function RecordScene({ onPickScene }: { onPickScene: (id: string) => void }) {
               <div className="note">Пока нет дублей. Нажми красную кнопку или клавишу <span className="k">R</span> — после сигналов говори в такт бегущему тексту.</div>
             )}
             {line && [...takesOf(line.line_id)].reverse().map((t, i, arr) => (
-              <TakeItem key={t.id} take={t} n={arr.length - i} speaker={spk(t.speaker_id)} lineDur={line.end_rel - line.start_rel} lips={lips} onRetake={() => void record("line")} canRetake={phase === "idle" && !wait.blocked} />
+              <TakeItem key={t.id} take={t} n={arr.length - i} speaker={spk(t.speaker_id)} lineDur={line.end_rel - line.start_rel} lips={lips} onRetake={() => void record("line")} canRetake={phase === "idle" && !wait.blocked} player={player} busy={phase !== "idle"} />
             ))}
             {!line && <div className="note">Выбери реплику слева.</div>}
             {line && isDub(line) && (
@@ -718,7 +719,7 @@ function LineItem(props: {
 }
 
 // ───────────── дубль ─────────────
-function TakeItem({ take: t, n, speaker, lineDur, lips, onRetake, canRetake }: { take: Take; n: number; speaker?: Speaker; lineDur: number; lips: boolean; onRetake: () => void; canRetake: boolean }) {
+function TakeItem({ take: t, n, speaker, lineDur, lips, onRetake, canRetake, player, busy }: { take: Take; n: number; speaker?: Speaker; lineDur: number; lips: boolean; onRetake: () => void; canRetake: boolean; player: Player; busy: boolean }) {
   const take = t as TakeX;
   const engine = useStore((s) => s.engine)!;
   const project = useStore((s) => s.project)!;
@@ -730,7 +731,9 @@ function TakeItem({ take: t, n, speaker, lineDur, lips, onRetake, canRetake }: {
   const rawRemark = useStore((s) => s.remarks[`${project.id}/${scene.id}/${take.id}`]);
   const file = isFileTake(take);
   // советы про губы не нужны ни в закадровом режиме, ни дублю из файла: у файла нет привязки ко времени
-  const remark = visibleRemark(rawRemark, { lips, file });
+  // тихо записано (по громкости речи, а не только по пику) — своя строка; тот же совет помощника второй раз не показываем
+  const quiet = !take.empty && !isClipped(take) && isQuiet(take);
+  const remark = visibleRemark(rawRemark, { lips, file, quietShown: quiet });
   const loadRemark = useStore((s) => s.loadRemark);
   const url = engine.takeUrl(project.id, scene.id, take);
   const peaks = useWavePeaks(url, take.id);
@@ -775,6 +778,7 @@ function TakeItem({ take: t, n, speaker, lineDur, lips, onRetake, canRetake }: {
       </div>
       {why && <div className="starwhy" data-testid="star-why"><Star size={10} fill="currentColor" />{why}</div>}
       <Waveform peaks={peaks} color={speaker?.color ?? "#f0b44c"} progress={prog} height={30} />
+      <TakeShift take={take} player={player} disabled={busy} />
       {take.empty && <div className="tnote bad" role="alert" data-testid="take-empty"><AlertTriangle size={11} /><span>{EMPTY_TEXT}</span></div>}
       {review.kind !== "unknown" && !take.empty && (
         <div className={"tnote " + (review.warn ? "warn" : "ok")} data-testid="take-review" data-kind={review.kind}>
@@ -784,6 +788,7 @@ function TakeItem({ take: t, n, speaker, lineDur, lips, onRetake, canRetake }: {
       )}
       {take.tail_trimmed && !take.empty && <div className="tnote" data-testid="take-trimmed"><Scissors size={11} /><span>Повтор в конце отрезан.</span><button className="btn sm" onClick={() => void untrimTail(take.id)}>Вернуть</button></div>}
       {clipped && <div className="tnote warn" data-testid="take-clipped"><AlertTriangle size={11} /><span>{CLIPPED_TEXT}</span></div>}
+      {quiet && <div className="tnote warn" data-testid="take-quiet"><AlertTriangle size={11} /><span>{QUIET_TEXT}</span></div>}
       {file && <div className="tnote" data-testid="take-from-file"><Upload size={11} /><span>Загружен файлом: попадание в губы не проверяем.</span></div>}
       {!take.empty && (remark || (!rawRemark && !file) || (!lips && rawRemark)) && (
         <div className={"remark " + (remark?.severity ?? "")} aria-label="Замечание помощника">
@@ -793,7 +798,7 @@ function TakeItem({ take: t, n, speaker, lineDur, lips, onRetake, canRetake }: {
           )}</span>
         </div>
       )}
-      {remark?.severity === "warn" && !take.empty && (
+      {(remark?.severity === "warn" || quiet) && !take.empty && (
         <button className="btn sm retake" onClick={onRetake} disabled={!canRetake}><RotateCw size={11} />Записать ещё раз</button>
       )}
       <span className="sr">{fmtSec(lineDur)}</span>

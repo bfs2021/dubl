@@ -15,6 +15,7 @@ import { fmtRel, fmtSec, plural } from "../lib/format";
 import { inTauri } from "../api/client";
 import type { RenderAspect, RenderFit, SubtitleMode, SubtitleText } from "../api/types";
 import type { TakeX } from "../lib/takeReview";
+import { mixWarning } from "../lib/mixCheck";
 
 const FORMATS: { id: RenderAspect; title: string; desc: string; w: number; h: number }[] = [
   { id: "16:9", title: "16:9", desc: "YouTube, VK", w: 46, h: 26 },
@@ -116,6 +117,10 @@ function RenderReady() {
   const lufs = -14;
   const voiced = chosen.filter((s) => s.takes.some((t) => t.selected && !(t as TakeX).empty));
   const noVoice = chosen.length > 0 && voiced.length === 0;
+  // честно: голос тонет или ролик придётся сильно поднимать — одна строка с действием (первая такая сцена)
+  const warns = voiced.map((s) => ({ scene: s, warn: mixWarning(s) })).filter((x): x is { scene: typeof x.scene; warn: NonNullable<typeof x.warn> } => !!x.warn);
+  const mixWarn = warns[0] ?? null;
+  const warnScenes = warns.filter((x) => x.warn.kind === "autopilot").map((x) => x.scene);
   const shownPath = savedPath || out;
   const wanted = out.split(/[\\/]/).pop() ?? "";
   const gotName = shownPath.split(/[\\/]/).pop() ?? "";
@@ -286,6 +291,14 @@ function RenderReady() {
             <div className="banner" role="status" data-testid="no-voice">
               <span>В {chosen.length === 1 ? "этой сцене" : "выбранных сценах"} нет дублей, поэтому собирать пока нечего. Запиши голос или отметь ★ нужный дубль.</span>
               <button className="btn sm amber" onClick={() => nav(`/p/${project.id}/record`)}>К записи</button>
+            </div>
+          )}
+          {!running && !noVoice && mixWarn && (
+            <div className="banner" role="status" data-testid="mix-warn" data-kind={mixWarn.warn.kind}>
+              <span>{chosen.length > 1 ? `«${mixWarn.scene.title}»: ` : ""}{mixWarn.warn.text}</span>
+              {mixWarn.warn.kind === "autopilot" && <button className="btn sm amber" onClick={() => { for (const s of warnScenes) void patchScene({ mix: { ...s.mix, autopilot: true } }, s.id); }}>Вернуть автопилот</button>}
+              {mixWarn.warn.kind === "record_louder" && <button className="btn sm amber" onClick={() => nav(`/p/${project.id}/record`)}>К записи</button>}
+              {mixWarn.warn.kind === "buried" && <button className="btn sm amber" onClick={() => nav(`/p/${project.id}/mix`)}>К сведению</button>}
             </div>
           )}
           {!done && (

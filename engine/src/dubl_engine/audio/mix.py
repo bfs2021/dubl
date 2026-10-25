@@ -22,7 +22,7 @@ from pathlib import Path
 
 import numpy as np
 
-from ..models import MixMode, MixSettings, Scene, SceneLine, Take, TrackSettings
+from ..models import MixCheck, MixMode, MixSettings, Scene, SceneLine, Take, TrackSettings
 from ..util import EngineError
 from .clean import clean_voice
 from .denoise import denoise_voice
@@ -47,6 +47,9 @@ SPREAD_COMPRESS_DB = 6.0        # голос «прыгает» по громк�
 BLIP_MAX_S = 0.25               # короткий стук/щелчок в самом начале записи (нажатие кнопки), отделённый паузой, вырезаем
 BLIP_GAP_S = 0.8
 TAKE_FADE_MS = 25.0
+# проверка готового сведения (mix_check): голос тонет или ролик приходится сильно поднимать — честно предупреждаем
+VOICE_BURIED_DB = 4.0           # новые голоса громче фона в моменты речи меньше чем на столько — голос тонет
+MASTER_BOOST_WARN_DB = 10.0     # мастеринг поднимает сведение больше чем на столько — вместе с голосом вылезут шумы фона
 
 
 @dataclass
@@ -444,9 +447,60 @@ def _unassigned_voices(scene: Scene, stems: SceneStems, sr: int, n: int) -> np.n
 
 
 # ─────────────────────────── сведение ───────────────────────────
-def mix_scene(scene: Scene, stems: SceneStems, out_wav) -> Path:
+def _bed_vs_voice(bed: np.ndarray, voice_bus: np.ndarray, sr: int) -> float | None:
+    """Насколько новые голоса громче всего остального (фон, оригиналы) в моменты, когда они звучат, дБ (LUFS − LUFS).
+    None — новых голосов нет."""
+    import pyloudnorm as pyln
+
+    if np.abs(voice_bus).max() <= 1e-6:
+        return None
+    l_voice = _speech_lufs(voice_bus, sr)
+    if l_voice is None:
+        return None
+    act = _activity(voice_bus, sr, lookahead=0.0) > 0.5
+    ref = to_mono(bed)[act[: len(bed)]]
+    if len(ref) < int(0.45 * sr):
+        ref = np.concatenate([ref, np.zeros(int(0.45 * sr) - len(ref), dtype=np.float32)])
+    l_bed = float(pyln.Meter(sr).integrated_loudness(ref.astype(np.float32)))
+    if not np.isfinite(l_bed) or l_bed < -70.0:
+        return 60.0                                           # фона в моменты речи нет — голос точно не тонет
+    return float(l_voice - l_bed)
+
+
+def _lufs(x: np.ndarray, sr: int) -> float | None:
+    import pyloudnorm as pyln
+
+    if len(x) < int(0.45 * sr):
+        x = np.concatenate([x, np.zeros((int(0.45 * sr) - len(x),) + x.shape[1:], dtype=np.float32)])
+    v = float(pyln.Meter(sr).integrated_loudness(np.asarray(x, dtype=np.float32)))
+    return v if np.isfinite(v) and v > -70.0 else None
+
+
+def mix_check(mix: MixSettings, voice_over_bg_db: float | None, master_gain_db: float | None) -> MixCheck:
+    """Итог сведения для честного предупреждения. Голос тонет (меньше VOICE_BURIED_DB над фоном) или мастер поднимает
+    ролик больше MASTER_BOOST_WARN_DB → совет: автопилот выключен — включи его; включён, но дубль не вытянуть без шума
+    (boost_capped) — перезапиши громче; включён, а голос всё равно тонет — фон тише. Тихий исходник при включённом
+    автопилоте и нормальном голосе — не повод ругаться: тут человеку делать нечего."""
+    buried = voice_over_bg_db is not None and voice_over_bg_db < VOICE_BURIED_DB
+    boosted = master_gain_db is not None and master_gain_db > MASTER_BOOST_WARN_DB
+    warning = None
+    if buried or boosted:
+        if not mix.autopilot:
+            warning = "autopilot"
+        elif any(t.boost_capped for t in mix.tracks.values()):
+            warning = "record_louder"
+        elif buried:
+            warning = "buried"
+    r = lambda v: None if v is None else round(float(v), 1)   # noqa: E731
+    return MixCheck(voice_over_bg_db=r(voice_over_bg_db), master_gain_db=r(master_gain_db), warning=warning)
+
+
+def mix_scene(scene: Scene, stems: SceneStems, out_wav, report: dict | None = None) -> Path:
     """Свести сцену: фон (+ducking под новыми голосами) + оригинальные голоса + дубли. Выход — stereo float32 WAV
-    длиной с background. Позиции дублей — см. docstring модуля."""
+    длиной с background. Позиции дублей — см. docstring модуля.
+
+    `report` (если передан) заполняется замерами для mix_check: voice_over_bg_db — новые голоса над всем остальным
+    в моменты речи (дБ), mix_lufs — громкость сведения до мастеринга."""
     from .separate import span_mask
     mix = scene.mix
     bg, sr = read_wav(stems.background)
@@ -527,8 +581,12 @@ def mix_scene(scene: Scene, stems: SceneStems, out_wav) -> Path:
         elif gain > 0.0:
             out[:m] += xo[:m] * (np.float32(gain) * (1.0 - rm_all[:m]))[:, None]
 
+    if report is not None:
+        report["voice_over_bg_db"] = _bed_vs_voice(out, voice_bus, sr)
     # новые голоса поверх (в центр)
     out += voice_bus[:, None]
+    if report is not None:
+        report["mix_lufs"] = _lufs(out, sr)
     return write_wav(out_wav, out, sr)
 
 

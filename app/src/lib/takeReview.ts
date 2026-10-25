@@ -78,6 +78,11 @@ export function starReason(t: TakeX, siblings: TakeX[]): string {
 
 /** Порог перегруза движка: доля срезанных отсчётов выше 0,05 % (audio.levels). */
 export const CLIP_PCT = 0.05;
+/** Тихий дубль (как llm.director в движке): речь тише QUIET_LUFS (цель речи −20…−24) или пик тише QUIET_PEAK_DB. */
+export const QUIET_LUFS = -32;
+export const QUIET_PEAK_DB = -24;
+/** Пик тише — это уже не «тихо», а «почти ничего не слышно» (свой совет). */
+export const SILENT_PEAK_DB = -50;
 
 /** Дубль с перегрузом? clip_pct считает движок; у старого движка поля нет — смотрим на пик. */
 export function isClipped(t: TakeX): boolean {
@@ -85,7 +90,17 @@ export function isClipped(t: TakeX): boolean {
   return t.peak_db != null && t.peak_db > -0.3;
 }
 
+/** Дубль записан тихо: по громкости речи (LUFS), даже если пик нормальный, — или по пику, если громкость не мерили. */
+export function isQuiet(t: Pick<Take, "peak_db" | "loudness_lufs"> & { empty?: boolean }): boolean {
+  if (t.empty || (t.peak_db != null && t.peak_db < SILENT_PEAK_DB)) return false;
+  if (t.loudness_lufs != null && t.loudness_lufs < QUIET_LUFS) return true;
+  return t.peak_db != null && t.peak_db < QUIET_PEAK_DB;
+}
+
 export const CLIPPED_TEXT = "Записано с перегрузом, подальше от микрофона — перегруз починили, но лучше переписать.";
+export const QUIET_TEXT = "Тихо записано — поднеси микрофон ближе или прибавь громкость микрофона в системе.";
+/** Совет помощника про тихую запись (свои слова у демо, движка и ИИ) — его прячем, когда уже показана строка QUIET_TEXT. */
+export const QUIET_REMARK_RE = /^(Тихо|Тихая запись|Тебя еле слышно|Запись в файле тихая)/i;
 export const EMPTY_TEXT = "Запись почти пустая. Проверь, что выбран нужный микрофон, и запиши ещё раз.";
 export const FILE_TEXT = "Загружен файлом: попадание в губы не проверяем.";
 
@@ -107,8 +122,10 @@ export interface RemarkLike { text: string; more?: string; severity: "ok" | "war
  * Совет под дублем. Про губы и вступление не говорим, если это закадровый режим или дубль из файла
  * (у файла нет привязки ко времени). undefined — совет прячем.
  */
-export function visibleRemark<T extends RemarkLike>(raw: T | undefined, opts: { lips: boolean; file: boolean }): T | undefined {
+export function visibleRemark<T extends RemarkLike>(raw: T | undefined, opts: { lips: boolean; file: boolean; quietShown?: boolean }): T | undefined {
   if (!raw) return raw;
   if ((!opts.lips || opts.file) && TIMING_REMARK_RE.test(raw.text)) return undefined;
+  // про тишину уже сказано строкой QUIET_TEXT — второй раз то же самое не повторяем (остальные советы оставляем)
+  if (opts.quietShown && QUIET_REMARK_RE.test(raw.text)) return raw.more ? ({ ...raw, text: raw.more, more: undefined } as T) : undefined;
   return raw;
 }

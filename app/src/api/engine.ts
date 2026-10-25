@@ -87,6 +87,8 @@ export interface Engine {
   proxyVideo(pid: string): ProxySource | null;
   clipUrl(pid: string, scid: string): string | null;
   previewUrl(pid: string, scid: string): string | null;
+  /** фон сцены без голосов (background.wav, есть после подготовки сцены); null — нет (демо) */
+  backgroundUrl(pid: string, scid: string): string | null;
   takeUrl(pid: string, scid: string, take: Take): string | null;
   thumbnailUrl(pid: string, rel: string | null | undefined): string | null;
 }

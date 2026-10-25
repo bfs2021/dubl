@@ -62,6 +62,10 @@ def test_report_loudness():
     assert take_report(mk_take(peak_db=-0.2), LINE)["loudness"] == "clipping"
     assert take_report(mk_take(peak_db=-40, loudness_lufs=-45), LINE)["loudness"] == "too_quiet"
     assert take_report(mk_take(peak_db=None, loudness_lufs=None), LINE)["loudness"] == "ok"
+    # пик нормальный, а речь тихая (−35,5 LUFS при пике −15,8 — реальный дубль) — всё равно «тихо записано»
+    r = take_report(mk_take(peak_db=-15.8, loudness_lufs=-35.5), LINE)
+    assert r["loudness"] == "too_quiet" and "микрофон ближе" in rule_based_feedback(r)
+    assert take_report(mk_take(peak_db=-8, loudness_lufs=-22), LINE)["loudness"] == "ok"
 
 
 # ─────────── rule_based_feedback ───────────
@@ -69,7 +73,7 @@ def test_rule_feedback_praise_and_advice():
     good = rule_based_feedback(take_report(mk_take(), LINE))
     assert "Отличный" in good
     for kw, word in [(dict(offset_ms=-300), "отстаёшь"), (dict(offset_ms=300), "раньше губ"), (dict(peak_db=0.0), "перегружен"),
-                     (dict(peak_db=-40, loudness_lufs=-45), "слышно"), (dict(stretch=0.85), "длиннее"),
+                     (dict(peak_db=-40, loudness_lufs=-45), "Тихо записано"), (dict(stretch=0.85), "длиннее"),
                      (dict(recognized_text="что-то иное совсем"), "Текст")]:
         text = rule_based_feedback(take_report(mk_take(**kw), LINE))
         assert word in text, (kw, text)
@@ -198,6 +202,20 @@ def test_apply_patches_clamp_and_reject():
 def test_apply_patches_nothing_valid_keeps_autopilot():
     out = apply_patches(MixSettings(), [MixPatch(target="master", field="mode", value="karaoke")])
     assert out.autopilot is True and out == MixSettings()
+
+
+def test_apply_patches_room_fx_mute_keep_autopilot():
+    """Комнату, эффект и «выкл.» автопилот сам не трогает — значит, и выключаться ему незачем."""
+    out = apply_patches(MixSettings(), [
+        MixPatch(target="s1", field="room", value="street"),
+        MixPatch(target="s1", field="voice_fx", value="robot"),
+        MixPatch(target="s2", field="mute", value=True),
+    ])
+    assert out.autopilot is True and out.tracks["s1"].room == "street" and out.tracks["s2"].mute is True
+    for p in (MixPatch(target="s1", field="gain_db", value=2), MixPatch(target="master", field="target_lufs", value=-16),
+              MixPatch(target="master", field="duck_background", value=False),
+              MixPatch(target="master", field="mode", value="voiceover")):
+        assert apply_patches(MixSettings(), [p]).autopilot is False, p
 
 
 def test_rooms_and_fx_have_required_keys():

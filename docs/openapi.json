@@ -1975,6 +1975,51 @@
         "title": "MicProfile",
         "type": "object"
       },
+      "MixCheck": {
+        "description": "Проверка сведения после последней сборки сцены (превью или рендер): не тонет ли голос и не пришлось ли сильно\nподнимать ролик. Считает движок (pipeline.scene._render); любая правка сведения или дублей её сбрасывает.",
+        "properties": {
+          "master_gain_db": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Master Gain Db"
+          },
+          "voice_over_bg_db": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voice Over Bg Db"
+          },
+          "warning": {
+            "anyOf": [
+              {
+                "enum": [
+                  "autopilot",
+                  "record_louder",
+                  "buried"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Warning"
+          }
+        },
+        "title": "MixCheck",
+        "type": "object"
+      },
       "MixMode": {
         "enum": [
           "dub",
@@ -2695,6 +2740,16 @@
               "tracks": {},
               "true_peak_db": -1.0
             }
+          },
+          "mix_check": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MixCheck"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "prepare_state": {
             "default": "interrupted",

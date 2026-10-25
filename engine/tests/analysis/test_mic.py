@@ -61,6 +61,13 @@ def test_verdicts_and_advice(kw, verdict, fragment):
     assert m.clipping is bool(kw.get("clip"))
 
 
+def test_quiet_by_average_level_even_with_normal_peak():
+    """Профиль с ПК пользователя: речь −35,4 дБ, пик −14,6, шум −67. Пик в норме, а голос тихий — так и говорим."""
+    v, adv = mic.judge(-67.0, -35.4, -14.6, False, True)
+    assert v == "quiet" and adv.startswith("Микрофон тихий") and "настройках звука" in adv
+    assert mic.judge(-67.0, -24.0, -10.0, False, True)[0] == "good"
+
+
 def test_silent_microphone():
     x = np.zeros(5 * SR, dtype=np.float32)
     m = mic.analyze_mic(x, SR, silence_s=2.0)

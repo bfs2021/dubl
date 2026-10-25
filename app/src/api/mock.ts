@@ -590,6 +590,7 @@ export class MockEngine implements Engine {
       }
     }
     if (patch.mix) {
+      if (JSON.stringify(patch.mix) !== JSON.stringify(sc.mix)) sc.mix_check = null; // как движок: проверка звука устарела
       sc.mix = clone(patch.mix);
       if (sc.mix.autopilot) this.automix(sc);
     }
@@ -598,13 +599,14 @@ export class MockEngine implements Engine {
   }
   private translated = new Map<string, string>();
 
+  /** Имитация audio.mix.automix: громкость подбирает сам, а комнату, эффект, «выкл.» и «только она» оставляет как выбрал человек. */
   private automix(sc: Scene) {
     sc.mix.background = { ...sc.mix.background, gain_db: -6 };
     for (const sid of sc.dubbed_speakers) {
       const t = sc.takes.find((x) => x.speaker_id === sid && x.selected);
       const tr = sc.mix.tracks[sid] ?? defaultTrack();
       const loud = t?.loudness_lufs ?? -20;
-      sc.mix.tracks[sid] = { ...tr, gain_db: Math.round(clamp(-20 - loud, -9, 9) * 2) / 2, room: "auto" };
+      sc.mix.tracks[sid] = { ...tr, gain_db: Math.round(clamp(-20 - loud, -9, 9) * 2) / 2 };
     }
   }
   async deleteScene(pid: string, scid: string) {
@@ -687,8 +689,8 @@ export class MockEngine implements Engine {
     const speech = samples.slice(cut);
     const peak = peakDb(speech);
     const found = peak > -50;
-    const verdict = !found ? "silent" : peak > -3 ? "loud" : peak < -26 ? "quiet" : noise > -45 ? "noisy" : "good";
-    const advice = { good: "Всё хорошо: голос слышно, в комнате тихо.", quiet: "Тихо — подойди ближе к микрофону.", loud: "Громковато — отодвинься от микрофона.", noisy: "В комнате шумно — закрой окно и выключи вентилятор.", silent: "Не слышу твой голос — проверь микрофон." }[verdict];
+    const verdict = !found ? "silent" : peak > -3 ? "loud" : peak < -26 || rmsDb(speech) < -30 ? "quiet" : noise > -45 ? "noisy" : "good";
+    const advice = { good: "Всё хорошо: голос слышно, в комнате тихо.", quiet: "Микрофон тихий: прибавь ему громкость в настройках звука или подойди ближе к микрофону — на ширину ладони.", loud: "Громковато — отодвинься от микрофона.", noisy: "В комнате шумно — закрой окно и выключи вентилятор.", silent: "Не слышу твой голос — проверь микрофон." }[verdict];
     return { noise_floor_db: noise, speech_db: rmsDb(speech), peak_db: peak, snr_db: rmsDb(speech) - noise, clipping: peak > -0.3, speech_found: found, verdict, advice, saved: found } as MicCheckResult;
   }
   async micSignal(): Promise<ArrayBuffer> { return new ArrayBuffer(0); }
@@ -822,6 +824,7 @@ export class MockEngine implements Engine {
   proxyVideo(): ProxySource | null { return null; }
   clipUrl() { return null; }
   previewUrl() { return null; }
+  backgroundUrl() { return null; }
   takeUrl(pid: string, scid: string, t: Take) { return this.takeUrls.get(`${pid}/${scid}/${t.id}`) ?? null; }
   thumbnailUrl() { return null; }
 

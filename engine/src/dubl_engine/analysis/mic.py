@@ -21,6 +21,8 @@ SR = 48000
 NOISY_FLOOR_DB = -45.0      # шум комнаты громче этого — «шумно»
 NOISY_SNR_DB = 25.0         # речь громче шума меньше чем на столько — «шумно»
 QUIET_PEAK_DB = -26.0       # пик речи тише — «подойди ближе»
+QUIET_SPEECH_DB = -30.0     # средняя громкость речи тише — микрофон тихий, даже если пики нормальные (крик в паузах
+                            # не спасает: дубль потом приходится поднимать на 15–20 дБ вместе с шумом)
 LOUD_PEAK_DB = -6.0         # пик речи громче — «чуть дальше»
 SILENT_PEAK_DB = -50.0      # пик тише — микрофон ничего не слышит
 CLIP_LEVEL = 0.989          # отсчёт не тише этого (доля полной шкалы) — на потолке
@@ -35,6 +37,17 @@ ADVICE = {
     "clip": "Звук рвётся на громких местах. Отодвинься от микрофона или убавь его громкость в настройках звука.",
     "noisy": "В комнате шумно: фон слышен рядом с голосом. Закрой окно, выключи вентилятор — или подойди ближе к микрофону.",
 }
+
+
+def _os_name() -> str:
+    """Как назвать систему в совете про громкость микрофона (движок работает на той же машине, что и интерфейс)."""
+    import sys
+    return "Windows" if sys.platform.startswith("win") else "macOS" if sys.platform == "darwin" else "системы"
+
+
+def quiet_advice() -> str:
+    return (f"Микрофон тихий: прибавь ему громкость в настройках звука {_os_name()} "
+            "или подойди ближе к микрофону — на ширину ладони.")
 
 
 def _db(v: float) -> float:
@@ -112,8 +125,8 @@ def judge(noise_db: float | None, speech_db: float | None, peak_db: float | None
         return "loud", ADVICE["clip"]
     if peak_db > LOUD_PEAK_DB:
         return "loud", ADVICE["loud"]
-    if peak_db < QUIET_PEAK_DB:
-        return "quiet", ADVICE["quiet"]
+    if peak_db < QUIET_PEAK_DB or (speech_db is not None and speech_db < QUIET_SPEECH_DB):
+        return "quiet", quiet_advice()
     snr = None if (noise_db is None or speech_db is None) else speech_db - noise_db
     if (noise_db is not None and noise_db > NOISY_FLOOR_DB) or (snr is not None and snr < NOISY_SNR_DB):
         return "noisy", ADVICE["noisy"]

@@ -1752,6 +1752,19 @@ export interface components {
             speech_db?: number | null;
         };
         /**
+         * MixCheck
+         * @description Проверка сведения после последней сборки сцены (превью или рендер): не тонет ли голос и не пришлось ли сильно
+         *     поднимать ролик. Считает движок (pipeline.scene._render); любая правка сведения или дублей её сбрасывает.
+         */
+        MixCheck: {
+            /** Master Gain Db */
+            master_gain_db?: number | null;
+            /** Voice Over Bg Db */
+            voice_over_bg_db?: number | null;
+            /** Warning */
+            warning?: ("autopilot" | "record_louder" | "buried") | null;
+        };
+        /**
          * MixMode
          * @enum {string}
          */
@@ -2091,6 +2104,7 @@ export interface components {
              *     }
              */
             mix: components["schemas"]["MixSettings"];
+            mix_check?: components["schemas"]["MixCheck"] | null;
             /**
              * Prepare State
              * @default interrupted

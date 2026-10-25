@@ -208,6 +208,16 @@ class MixSettings(BaseModel):
     denoise: bool = True            # шумодав дублей по снимку тишины (включается сам, если шум заметен)
 
 
+class MixCheck(BaseModel):
+    """Проверка сведения после последней сборки сцены (превью или рендер): не тонет ли голос и не пришлось ли сильно
+    поднимать ролик. Считает движок (pipeline.scene._render); любая правка сведения или дублей её сбрасывает."""
+    voice_over_bg_db: float | None = None   # насколько новые голоса громче фона в моменты речи, дБ; None — голосов нет
+    master_gain_db: float | None = None     # на сколько мастеринг поднял сведение до цели, дБ (минус — сделал тише)
+    # что посоветовать: «autopilot» — автопилот выключен, включи его; «record_louder» — дубли записаны тихо, перезапиши;
+    # «buried» — голос тонет в фоне, убавь фон; None — всё в порядке
+    warning: Literal["autopilot", "record_louder", "buried"] | None = None
+
+
 class Scene(BaseModel):
     id: str                         # "sc001"
     title: str
@@ -218,6 +228,7 @@ class Scene(BaseModel):
     lines: list[SceneLine] = []
     takes: list[Take] = []
     mix: MixSettings = MixSettings()
+    mix_check: MixCheck | None = None   # итог проверки последней сборки; None — не собирали после правок
     stems_ready: bool = False       # голоса и фон разделены И все файлы сцены на месте
     # Честный статус подготовки: «ready» ⇔ stems_ready; «running» — идёт сейчас; «interrupted» — подготовка не дошла до
     # конца (закрыли программу, отмена, ошибка) и не идёт: сцену можно подготовить заново (POST …/scenes/{scid}/prepare).

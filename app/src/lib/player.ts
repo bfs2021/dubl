@@ -22,6 +22,9 @@ export class Player {
     this.t = t0;
   }
 
+  /** привязанный <video> (null — виртуальный таймер) */
+  get media(): HTMLVideoElement | null { return this.video; }
+
   attach(video: HTMLVideoElement | null) {
     this.video = video;
     if (video) {

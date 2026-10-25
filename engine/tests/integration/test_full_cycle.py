@@ -165,6 +165,9 @@ def test_full_cycle(env, rich_mkv, tmp_path):
     prev = sd / "preview.mp4"
     assert prev.is_file() and j["result"]["url"] == f"/files/{pid}/scenes/{scid}/preview.mp4"
     assert client.get(j["result"]["url"]).status_code == 200
+    # после сборки — проверка сведения: автопилот включён, голос не тонет → предупреждения нет
+    chk = client.get(f"/projects/{pid}/scenes/{scid}").json()["mix_check"]
+    assert chk is not None and chk["voice_over_bg_db"] is not None and chk["warning"] is None, chk
 
     # 6. рендер 9:16
     out = tmp_path / "готово: ролик 'один'.mp4"

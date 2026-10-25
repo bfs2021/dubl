@@ -743,6 +743,21 @@ export const useStore = create<AppState>()((set, get) => {
     } else if (job.kind === "render_project" || job.kind === "render") {
       s.toast("Ролик готов.", "ok", { key: `job-${job.id}` });
     }
+    if (job.kind === "preview" || job.kind === "render_project" || job.kind === "render") void pullMixCheck(job.project_id);
+  }
+
+  /** После сборки движок кладёт в сцены проверку звука (mix_check). Забираем только её: остальное (настройки, которые
+   *  подобрал автопилот) не трогаем, чтобы превью на «Сведении» не пересобиралось лишний раз. */
+  async function pullMixCheck(pid: string) {
+    const { engine, project } = get();
+    if (!engine || project?.id !== pid) return;
+    try {
+      const p = await engine.getProject(pid);
+      const by = new Map(p.scenes.map((x) => [x.id, x.mix_check ?? null]));
+      set((s) => (s.project?.id === pid
+        ? { project: { ...s.project, scenes: s.project.scenes.map((x) => (by.has(x.id) ? { ...x, mix_check: by.get(x.id) } : x)) } }
+        : {}));
+    } catch { /* не вышло — предупреждение просто не обновится */ }
   }
 });
 

@@ -5,6 +5,7 @@
 import type { DirectorCommandResult, DirectorReport, DirectorTakeResult, MixPatch, MixSettings, Speaker, Take, TrackSettings } from "../api/types";
 import { ROOMS, VOICE_FX, defaultTrack, fxTitle, roomTitle } from "../api/presets";
 import { fmtNum, fmtSec } from "./format";
+import { QUIET_LUFS, QUIET_PEAK_DB, QUIET_TEXT, SILENT_PEAK_DB } from "./takeReview";
 
 export type Severity = "ok" | "warn";
 
@@ -45,7 +46,9 @@ export function takeReport(take: Pick<Take, "id" | "offset_ms" | "stretch" | "pe
   const timing = off <= -150 ? "late" : off >= 150 ? "early" : "ok";
   const length = lineDuration && take.stretch < 0.9 ? "too_long" : take.stretch > 1.1 ? "too_short" : "ok";
   const peak = take.peak_db ?? null;
-  const loudness = peak !== null && peak > -1 ? "clipping" : peak !== null && peak < -24 ? "too_quiet" : "ok";
+  const lufs = take.loudness_lufs ?? null;
+  // как в движке (llm.director.take_report): тихо — по пику ИЛИ по громкости речи (пик бывает нормальным, а речь тихой)
+  const loudness = peak !== null && peak > -1 ? "clipping" : (peak !== null && peak < QUIET_PEAK_DB) || (lufs !== null && lufs < QUIET_LUFS) ? "too_quiet" : "ok";
   const problems: string[] = [];
   if (timing !== "ok") problems.push(timing === "late" ? "вступил поздно" : "вступил рано");
   if (length === "too_long") problems.push("длиннее оригинала");
@@ -59,14 +62,17 @@ export function takeReport(take: Pick<Take, "id" | "offset_ms" | "stretch" | "pe
 }
 
 /** Демо: слова помощника по замерам (в бою это делает ИИ). */
-export function takeRemark(take: Pick<Take, "offset_ms" | "stretch" | "peak_db" | "duration" | "fit_confidence">, lineDuration: number | null, file = false): { text: string; severity: Severity } {
+export function takeRemark(take: Pick<Take, "offset_ms" | "stretch" | "peak_db" | "duration" | "fit_confidence"> & { loudness_lufs?: number | null }, lineDuration: number | null, file = false): { text: string; severity: Severity } {
   const t = { ...take, peak_db: take.peak_db ?? null, fit_confidence: take.fit_confidence ?? null };
+  const lufs = take.loudness_lufs ?? null;
+  // тихо — по пику или по громкости речи: у тихого дубля пик бывает нормальным (−16 дБ), а речь −35 LUFS
+  const quiet = (t.peak_db !== null && t.peak_db < QUIET_PEAK_DB) || (lufs !== null && lufs < QUIET_LUFS);
   // Знаки — как в движке (models.Take): offset_ms < 0 — человек говорил позже губ; stretch < 1 — дубль пришлось сжать (он длиннее оригинала).
-  if (t.peak_db !== null && t.peak_db < -50) return { severity: "warn", text: "Почти ничего не слышно. Проверь микрофон и подойди ближе." };
+  if (t.peak_db !== null && t.peak_db < SILENT_PEAK_DB) return { severity: "warn", text: "Почти ничего не слышно. Проверь микрофон и подойди ближе." };
   if (t.peak_db !== null && t.peak_db > -1) return { severity: "warn", text: "Звук рвётся на пиках. Говори чуть тише или отодвинься от микрофона." };
   // файл к губам не привязан: про вступление, длину и «попал в губы» не говорим — только про громкость
   if (file) {
-    if (t.peak_db !== null && t.peak_db < -24) return { severity: "warn", text: "Тихая запись. Я подниму громкость, но может стать шумно." };
+    if (quiet) return { severity: "warn", text: "Тихая запись. Я подниму громкость, но может стать шумно." };
     return { severity: "ok", text: "Дубль из файла: громкость в порядке. Попадание в губы для файла не проверяем." };
   }
   if (t.fit_confidence !== null && t.fit_confidence < 0.3) return { severity: "warn", text: "Не нашёл, где ты говоришь. Попробуй ещё раз, чётче." };
@@ -74,7 +80,7 @@ export function takeRemark(take: Pick<Take, "offset_ms" | "stretch" | "peak_db" 
   if (t.offset_ms >= 150) return { severity: "warn", text: "Вступил рано — подожди полсекунды после сигнала." };
   if (t.stretch < 0.9 && lineDuration) return { severity: "warn", text: "Длиннее оригинала. Сократи текст кнопкой «Подогнать под длину» или говори быстрее." };
   if (t.stretch > 1.1) return { severity: "ok", text: "Получилось короче оригинала — можно говорить медленнее, с паузой." };
-  if (t.peak_db !== null && t.peak_db < -24) return { severity: "warn", text: "Тихо. Говори громче — я подниму, но будет шумно." };
+  if (quiet) return { severity: "warn", text: QUIET_TEXT };
   return { severity: "ok", text: "Хороший дубль: попал в движения губ и по громкости ровно." };
 }
 
@@ -142,6 +148,9 @@ export function parseCommand(text: string, speakers: Speaker[], mix: MixSettings
   return { patches, mix: applyPatches(mix, patches, defaultTrack), ai_fallback: false };
 }
 
+/** Поля, правка которых выключает автопилот (иначе он затёр бы просьбу). Как LOUDNESS_FIELDS в движке. */
+export const LOUDNESS_FIELDS: ReadonlySet<string> = new Set(["gain_db", "target_lufs", "duck_background", "mode"]);
+
 /** Применить изменения к настройкам (не меняя исходный объект). Как llm.director.apply_patches в движке. */
 export function applyPatches(mix: MixSettings, patches: MixPatch[], defaults: () => TrackSettings = defaultTrack): MixSettings {
   const out = structuredClone(mix);
@@ -158,7 +167,8 @@ export function applyPatches(mix: MixSettings, patches: MixPatch[], defaults: ()
     else if (p.field === "room") tr.room = String(p.value);
     else if (p.field === "voice_fx") tr.voice_fx = String(p.value);
   }
-  if (patches.length) out.autopilot = false; // ручная правка выключает автопилот (как в движке)
+  // правка громкости выключает автопилот (как llm.director.apply_patches); комнату, эффект и «выкл.» он и сам не трогает
+  if (patches.some((p) => LOUDNESS_FIELDS.has(p.field))) out.autopilot = false;
   return out;
 }
 

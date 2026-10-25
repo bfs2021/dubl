@@ -261,6 +261,59 @@ def test_automix_autopilot_off_returns_same(world):
     assert automix(scene, stems) == scene.mix
 
 
+def test_automix_keeps_manual_room_fx_mute_solo(world):
+    """Комнату, эффект, «выкл.» и «только она» выбирает человек — автопилот их не трогает (и поэтому не выключается)."""
+    scene, stems, scene_dir = world
+    f = _make_take_file(scene_dir, "t1", seg=(1.0, 3.0), level=0.3)
+    scene.takes = [_take("t1", "l1", "s1", f, selected=True)]
+    scene.mix = MixSettings(tracks={"s1": TrackSettings(room="street", voice_fx="robot", solo=True),
+                                    "s2": TrackSettings(mute=True, room="cave")})
+    mx = automix(scene, stems)
+    s1, s2 = mx.tracks["s1"], mx.tracks["s2"]
+    assert (s1.room, s1.voice_fx, s1.solo, s1.mute) == ("street", "robot", True, False)
+    assert (s2.room, s2.mute) == ("cave", True)
+    assert s1.gain_db != 0.0 and mx.autopilot          # громкость при этом подобрана
+
+
+def _check_world(world, *, level, bg_gain=0.0, gain=0.0):
+    scene, stems, scene_dir = world
+    f = _make_take_file(scene_dir, "t1", seg=(1.0, 3.0), level=level)
+    scene.takes = [_take("t1", "l1", "s1", f, selected=True)]
+    scene.mix = MixSettings(autopilot=False, tracks={"s1": TrackSettings(room="dry", gain_db=gain)},
+                            background=TrackSettings(gain_db=bg_gain), duck_background=False, keep_breaths=False)
+    return scene, stems
+
+
+def test_mix_report_voice_over_background(world, tmp_path):
+    from dubl_engine.audio.mix import VOICE_BURIED_DB, mix_check
+    # фон тише на 12 дБ — голос заметно выше фона; тихий дубль на полном фоне без автопилота — тонет
+    scene, stems = _check_world(world, level=1.0, bg_gain=-12.0)
+    rep: dict = {}
+    mix_scene(scene, stems, tmp_path / "a.wav", report=rep)
+    assert rep["voice_over_bg_db"] > VOICE_BURIED_DB + 2 and rep["mix_lufs"] is not None
+    scene, stems = _check_world(world, level=0.1)
+    rep2: dict = {}
+    mix_scene(scene, stems, tmp_path / "b.wav", report=rep2)
+    assert rep2["voice_over_bg_db"] < VOICE_BURIED_DB, rep2
+    assert rep["voice_over_bg_db"] - rep2["voice_over_bg_db"] == pytest.approx(12 + 20, abs=2.0)
+    assert mix_check(scene.mix, rep2["voice_over_bg_db"], 3.0).warning == "autopilot"
+
+
+def test_mix_check_warnings():
+    from dubl_engine.audio.mix import mix_check
+    off, on = MixSettings(autopilot=False), MixSettings()
+    capped = MixSettings(tracks={"s1": TrackSettings(boost_capped=True)})
+    assert mix_check(off, 12.0, 5.0).warning is None                    # всё нормально — молчим
+    assert mix_check(off, 2.0, 5.0).warning == "autopilot"              # голос тонет, автопилот выключен
+    assert mix_check(off, 12.0, 19.0).warning == "autopilot"            # ролик пришлось поднять на 19 дБ
+    assert mix_check(capped, 2.0, 12.0).warning == "record_louder"      # автопилот упёрся в потолок усиления
+    assert mix_check(on, 2.0, 5.0).warning == "buried"
+    assert mix_check(on, 12.0, 14.0).warning is None                    # тихий исходник, голос в порядке — делать нечего
+    assert mix_check(on, None, None).warning is None                    # голосов нет
+    c = mix_check(off, 2.345, 19.27)
+    assert (c.voice_over_bg_db, c.master_gain_db) == (2.3, 19.3)
+
+
 # ─────────────────────────── шум, перегруз, тихие и пустые дубли ───────────────────────────
 def _noisy_take_file(scene_dir, name, *, noise, level, seg=(1.0, 3.0), preroll=1.0, hot=False, seed=30):
     n = int((DUR + preroll) * SR)

@@ -14,6 +14,7 @@ import { Help } from "../components/Help";
 import { ROOMS, VOICE_FX, defaultTrack } from "../api/presets";
 import { fmtDb, fmtMs, fmtRel } from "../lib/format";
 import { takeIsUsable, type TakeX } from "../lib/takeReview";
+import { mixWarning } from "../lib/mixCheck";
 import type { MixSettings, Scene, Speaker, Take, TrackSettings } from "../api/types";
 
 interface TrackRow { id: string; title: string; color: string; sub: string; settings: TrackSettings; kind: "background" | "speaker" | "original"; voiced?: boolean; /** можно двигать громкость */ adjustable: boolean }
@@ -94,13 +95,16 @@ function MixScene({ scene }: { scene: Scene }) {
     if (next.autopilot) setByHand(false);
     void setMix(next);
   };
+  // автопилот выключает только громкость: комнату, эффект, «Выкл.» и «Только она» он сам не трогает (audio.mix.automix)
   const setTrack = (id: string, patch: Partial<TrackSettings>) => {
-    if (id === "background") update({ ...mix, background: { ...mix.background, ...patch }, autopilot: false });
-    else update({ ...mix, tracks: { ...mix.tracks, [id]: { ...(mix.tracks[id] ?? defaultTrack()), ...patch } }, autopilot: false });
+    const autopilot = mix.autopilot && patch.gain_db === undefined;
+    if (id === "background") update({ ...mix, background: { ...mix.background, ...patch }, autopilot });
+    else update({ ...mix, tracks: { ...mix.tracks, [id]: { ...(mix.tracks[id] ?? defaultTrack()), ...patch } }, autopilot });
   };
   const setAuto = (v: boolean) => update({ ...mix, autopilot: v }, false);
   const anyTakes = scene.takes.some((t) => t.selected && takeIsUsable(t as TakeX));
   const solo = rows.some((r) => r.settings.solo);
+  const warn = anyTakes ? mixWarning(scene) : null;
 
   const overlay = null;
 
@@ -172,15 +176,21 @@ function MixScene({ scene }: { scene: Scene }) {
         </div>
         <div className="pb col" style={{ gap: 14 }}>
           {!mix.autopilot && (
-            <div className="banner" role="status" data-testid="autopilot-off">
-              <span>{byHand ? "Автопилот выключен, потому что ты поменял настройки вручную. Всё остаётся как ты поставил." : "Автопилот выключен: громкость и звучание остаются такими, как стоят сейчас."}</span>
+            <div className="banner" role="status" data-testid="autopilot-off" data-warn={warn?.kind === "autopilot" ? "1" : undefined}>
+              <span>{warn?.kind === "autopilot" ? warn.text : byHand ? "Автопилот выключен, потому что ты поменял громкость вручную. Всё остаётся как ты поставил." : "Автопилот выключен: громкость остаётся такой, как стоит сейчас."}</span>
               <button className="btn sm amber" onClick={() => setAuto(true)}>Вернуть автопилот</button>
+            </div>
+          )}
+          {mix.autopilot && warn && (
+            <div className="banner" role="status" data-testid="mix-warn" data-kind={warn.kind}>
+              <span>{warn.text}</span>
+              {warn.kind === "record_louder" && <button className="btn sm amber" onClick={() => nav(`/p/${project.id}/record`)}>К записи</button>}
             </div>
           )}
           <div className="modeinfo" data-testid="mix-help">
             <span><b>Автопилот</b> — программа сама выравнивает громкость и звучание. Ничего делать не нужно.</span>
             <span><b>Помощник-режиссёр</b> — скажи словами, что поменять («Шкипер громче», «фон потише»), и он подвинет ползунки за тебя.</span>
-            <span><b>Тонкая настройка</b> — все ползунки вручную. Автопилот при этом выключится.</span>
+            <span><b>Тонкая настройка</b> — сдвиг, эхо и эффекты вручную. Если двинешь громкость, автопилот выключится.</span>
           </div>
           <DirectorPanel scene={scene} speakers={speakers} />
 
@@ -275,7 +285,7 @@ function FineTune({ scene, rows, mix, setTrack, update, onTake }: {
         <div className="col" style={{ gap: 10 }}>
           <h2>Общее</h2>
           <div className="opt"><span className="l">Фон приглушается под голосом</span><Switch label="Фон приглушается под голосом" checked={mix.duck_background} onChange={(v) => update({ ...mix, duck_background: v, autopilot: false })} /></div>
-          <div className="opt"><span className="l">Дыхание и шорохи из оригинала</span><Switch label="Дыхание и шорохи из оригинала" checked={mix.keep_breaths} onChange={(v) => update({ ...mix, keep_breaths: v, autopilot: false })} /></div>
+          <div className="opt"><span className="l">Дыхание и шорохи из оригинала</span><Switch label="Дыхание и шорохи из оригинала" checked={mix.keep_breaths} onChange={(v) => update({ ...mix, keep_breaths: v })} /></div>
           <div className="field"><div className="between"><span>Громкость оригинала (у тех, кого не озвучиваем)</span><span className="mono">{fmtDb(mix.original_voices_db, 0)}</span></div>
             <Fader label="Оригинальные голоса" min={-40} max={0} step={1} value={mix.original_voices_db} neutral={-14} onChange={(v) => update({ ...mix, original_voices_db: v, autopilot: false })} /></div>
           <details className="adv">
@@ -287,7 +297,7 @@ function FineTune({ scene, rows, mix, setTrack, update, onTake }: {
                 <Fader label="Предел громкости, dBTP" min={-6} max={0} step={0.5} neutral={-1} value={mix.true_peak_db} onChange={(v) => update({ ...mix, true_peak_db: v, autopilot: false })} /></div>
             </div>
           </details>
-          <div className="note">Любое ручное движение выключает автопилот. Вернуть его можно кнопкой сверху.</div>
+          <div className="note">Ползунки громкости и «Фон приглушается» выключают автопилот, а комната, эффект и «Выкл.» — нет. Вернуть автопилот можно кнопкой сверху.</div>
         </div>
       </div>
     </div>

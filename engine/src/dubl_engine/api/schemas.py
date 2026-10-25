@@ -292,7 +292,7 @@ class DirectorCommandResult(BaseModel):
     """POST /llm/director с text: что сделали по просьбе. Применять ничего не нужно — mix уже готов, его можно
     отправить в PATCH сцены как есть."""
     patches: list[MixPatch]                # каждое изменение с note; пусто — просьба не поняла
-    mix: MixSettings                       # настройки сведения после изменений (autopilot выключен, если что-то поменялось)
+    mix: MixSettings                       # настройки сведения после изменений (autopilot выключен, если менялась громкость)
     ai_model: str | None = None            # какая модель ответила (название); None — ИИ не участвовал
     ai_fallback: bool = False              # ответила запасная, а не назначенная в настройках
 

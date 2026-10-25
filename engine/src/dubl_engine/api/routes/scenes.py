@@ -100,6 +100,8 @@ def patch_scene(pid: str, scid: str, body: ScenePatch, store: StoreDep, jobs: Jo
         if body.dubbed_speakers is not None:
             sc.dubbed_speakers = list(dict.fromkeys(body.dubbed_speakers))
         if body.mix is not None:
+            if body.mix != sc.mix:
+                sc.mix_check = None              # проверка сведения была про прежние настройки — до новой сборки её нет
             sc.mix = body.mix
         if body.lines:
             by_id = {ln.line_id: ln for ln in sc.lines}
@@ -161,6 +163,7 @@ def patch_take(pid: str, scid: str, tid: str, body: TakePatch, store: StoreDep) 
             t.stretch = body.stretch
         if body.selected is not None:
             set_user_choice(sc, t, body.selected)
+            sc.mix_check = None                  # в сведение пошёл другой дубль — прежняя проверка устарела
         return t.model_copy(deep=True)
 
 

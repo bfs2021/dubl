@@ -548,6 +548,12 @@ details.adv[open] > summary { margin-bottom: 10px; }
 .tnote svg { flex: none; margin-top: 2px; } .tnote > span { flex: 1 1 140px; min-width: 0; overflow-wrap: anywhere; }
 .tnote.ok { color: var(--ok); } .tnote.warn { color: var(--warn); } .tnote.bad { color: var(--bad); }
 .take.emptyt { border-color: #5a2a24; background: #1a0f0e; }
+/* строка «Сдвиг»: ← раньше · +0,30 с · позже → · ▶ с видео */
+.takeshift { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; padding-top: 7px; border-top: 1px dashed var(--line); }
+.takeshift .lbl { font-size: 12px; font-weight: 600; margin-right: 2px; }
+.takeshift .btn { padding-inline: 7px; white-space: nowrap; }
+.takeshift .val { font-size: 12px; min-width: 52px; text-align: center; white-space: nowrap; }
+.takeshift .btn:last-child { margin-left: auto; }
 .take.emptyt .star[disabled] { opacity: .3; }
 .srcfile { margin-left: 6px; height: 17px; font-size: 10.5px; }
 

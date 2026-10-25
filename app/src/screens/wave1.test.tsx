@@ -257,6 +257,25 @@ describe("Разбор дубля по тексту", () => {
     await withTakes(() => [{ clip_pct: 0.6, selected: true }]);
     renderRoute(<RecordScreen />);
     expect(await screen.findByTestId("take-clipped")).toHaveTextContent("Записано с перегрузом, подальше от микрофона — перегруз починили, но лучше переписать.");
+    expect(screen.queryByTestId("take-quiet")).toBeNull();
+  });
+
+  it("тихо по громкости речи, хотя пик нормальный: одна строка «Тихо записано», совет помощника не дублирует", async () => {
+    // реальный дубль с ПК: пик −15,8 дБ, речь −35,5 LUFS
+    const t = await withTakes(() => [{ peak_db: -15.8, loudness_lufs: -35.5, clip_pct: 0, selected: true }]);
+    useStore.setState({ remarks: { [`p-fridge/sc001/${t[0].id}`]: { text: "Тихо записано — поднеси микрофон ближе или прибавь громкость микрофона в системе.", severity: "warn" } } });
+    renderRoute(<RecordScreen />);
+    expect(await screen.findByTestId("take-quiet")).toHaveTextContent("Тихо записано — поднеси микрофон ближе или прибавь громкость микрофона в системе.");
+    expect(screen.getAllByText(/Тихо записано/)).toHaveLength(1);
+    expect(screen.getByRole("button", { name: /Записать ещё раз/ })).toBeInTheDocument();
+  });
+
+  it("нормальная громкость — про тишину молчим", async () => {
+    await withTakes(() => [{ peak_db: -8, loudness_lufs: -21, clip_pct: 0, selected: true }]);
+    renderRoute(<RecordScreen />);
+    await screen.findByText(/Записать реплику/);
+    await screen.findAllByTestId("take");
+    expect(screen.queryByTestId("take-quiet")).toBeNull();
   });
 
   it("дубль из файла: нет «Начал на … раньше», нет совета про губы, пометка «из файла»", async () => {

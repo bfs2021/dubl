@@ -168,8 +168,10 @@ export function MicCheck({ open, onClose, timing = DEFAULT_TIMING, makeRecorder,
     await stop();
     const dev = devices.find((d) => d.deviceId === deviceId);
     const p = buildProfile({ noiseDb, speechPeak: sp.peak, speechRms: sp.rms, latencyMs: latency, headphones: phones, deviceId, deviceLabel: dev?.label ?? null });
-    if (verdictFromEngine) p.verdict = verdictFromEngine;
-    setEngineAdvice(adviceFromEngine);
+    // движок старой версии про тихий голос судил только по пику — свой замер средней громкости тоже учитываем
+    const quietHere = p.verdict === "quiet" && (verdictFromEngine === "good" || verdictFromEngine === "noisy");
+    if (verdictFromEngine && !quietHere) p.verdict = verdictFromEngine;
+    setEngineAdvice(quietHere ? null : adviceFromEngine);
     setProfile(p);
     setStep("result");
     // профиль — на устройстве; задержка — в настройки движка (её использует подгонка дублей)
@@ -265,6 +267,7 @@ export function MicCheck({ open, onClose, timing = DEFAULT_TIMING, makeRecorder,
             <dl className="micnums">
               <div><dt>Шум комнаты</dt><dd className="mono">{fmtDb(profile.noise_floor_db, 0)}</dd></div>
               <div><dt>Голос (пик)</dt><dd className="mono">{fmtDb(profile.speech_peak_db, 0)}</dd></div>
+              <div><dt>Голос (в среднем)</dt><dd className="mono">{fmtDb(profile.speech_rms_db, 0)}</dd></div>
               <div><dt>Голос выше шума</dt><dd className="mono">{Math.round(profile.snr_db)} дБ</dd></div>
               <div><dt>Задержка записи</dt><dd className="mono">{profile.latency_ms != null ? Math.round(profile.latency_ms) + " мс" : "не мерили"}</dd></div>
             </dl>

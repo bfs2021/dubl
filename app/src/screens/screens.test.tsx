@@ -13,6 +13,7 @@ import { App } from "../App";
 import { MemoryRouter } from "react-router-dom";
 import { render } from "@testing-library/react";
 import type { Job } from "../api/types";
+import { defaultTrack } from "../api/presets";
 
 beforeEach(async () => { await freshStore(); });
 
@@ -432,7 +433,7 @@ describe("Сведение: ползунки и автопилот", () => {
     expect(screen.queryByTestId("autopilot-off")).toBeNull();
     fireEvent.change(screen.getByLabelText(/Громкость: Музыка и шумы/), { target: { value: "-10" } });
     const bar = await screen.findByTestId("autopilot-off");
-    expect(bar).toHaveTextContent(/Автопилот выключен, потому что ты поменял/);
+    expect(bar).toHaveTextContent(/Автопилот выключен, потому что ты поменял громкость/);
     await userEvent.click(within(bar).getByRole("button", { name: "Вернуть автопилот" }));
     await waitFor(() => expect(useStore.getState().project!.scenes[0].mix.autopilot).toBe(true));
     expect(screen.queryByTestId("autopilot-off")).toBeNull();
@@ -442,6 +443,59 @@ describe("Сведение: ползунки и автопилот", () => {
     renderRoute(<MixScreen />);
     const help = await screen.findByTestId("mix-help");
     expect(help.children.length).toBe(3);
+  });
+  it("комната, эффект и «Выкл.» автопилот не выключают — и автопилот их не сбрасывает", async () => {
+    await openFridge();
+    renderRoute(<MixScreen />);
+    await screen.findByRole("region", { name: "Помощник-режиссёр" });
+    await userEvent.click(screen.getByTestId("fine-toggle"));
+    const roomSel = screen.getAllByRole("combobox").find((el) => [...(el as HTMLSelectElement).options].some((o) => o.value === "street"))!;
+    fireEvent.change(roomSel, { target: { value: "street" } });
+    await waitFor(() => expect(Object.values(useStore.getState().project!.scenes[0].mix.tracks).some((t) => t.room === "street")).toBe(true));
+    const m = useStore.getState().project!.scenes[0].mix;
+    expect(m.autopilot).toBe(true);
+    expect(screen.queryByTestId("autopilot-off")).toBeNull();
+    const fx = screen.getAllByRole("combobox").find((el) => [...(el as HTMLSelectElement).options].some((o) => o.value === "robot"))!;
+    fireEvent.change(fx, { target: { value: "robot" } });
+    await waitFor(() => expect(Object.values(useStore.getState().project!.scenes[0].mix.tracks).some((t) => t.voice_fx === "robot")).toBe(true));
+    await userEvent.click(screen.getAllByRole("button", { name: "Выкл." })[0]);
+    await waitFor(() => expect(Object.values(useStore.getState().project!.scenes[0].mix.tracks).some((t) => t.mute) || useStore.getState().project!.scenes[0].mix.background.mute).toBe(true));
+    expect(useStore.getState().project!.scenes[0].mix.autopilot).toBe(true);
+  });
+  it("автопилот выключен, а дубль тихий — честная строка «Голос тише музыки» с «Вернуть автопилот»", async () => {
+    await openFridge();
+    const st = useStore.getState();
+    const sc = st.project!.scenes[0];
+    // как у пользователя: автопилот выключен, дубль −35,5 LUFS при пике −15,8, дорожка −2 дБ
+    const takes = sc.takes.map((t) => (t.selected ? { ...t, peak_db: -15.8, loudness_lufs: -35.5 } : t));
+    await act(async () => { await useStore.getState().patchScene({ mix: { ...sc.mix, autopilot: false, tracks: { ...sc.mix.tracks, s1: { ...defaultTrack(), gain_db: -2 }, s2: { ...defaultTrack(), gain_db: -2 } } } }); });
+    act(() => useStore.setState({ project: { ...useStore.getState().project!, scenes: [{ ...useStore.getState().project!.scenes[0], takes }] } }));
+    renderRoute(<MixScreen />);
+    const bar = await screen.findByTestId("autopilot-off");
+    expect(bar).toHaveTextContent("Голос тише музыки — включи автопилот, он сам выровняет громкость.");
+    await userEvent.click(within(bar).getByRole("button", { name: "Вернуть автопилот" }));
+    await waitFor(() => expect(useStore.getState().project!.scenes[0].mix.autopilot).toBe(true));
+    expect(screen.queryByTestId("mix-warn")).toBeNull();
+  });
+  it("после сборки движок сказал «тонет» (mix_check) — строка видна; всё в порядке — строки нет", async () => {
+    await openFridge();
+    const sc = useStore.getState().project!.scenes[0];
+    act(() => useStore.setState({ project: { ...useStore.getState().project!, scenes: [{ ...sc, mix_check: { voice_over_bg_db: 1.5, master_gain_db: 6, warning: "buried" } }] } }));
+    renderRoute(<MixScreen />);
+    expect(await screen.findByTestId("mix-warn")).toHaveTextContent(/Голос тонет в музыке/);
+    act(() => useStore.setState({ project: { ...useStore.getState().project!, scenes: [{ ...sc, mix_check: { voice_over_bg_db: 12, master_gain_db: 6, warning: null } }] } }));
+    await waitFor(() => expect(screen.queryByTestId("mix-warn")).toBeNull());
+  });
+  it("Рендер: голос тонет — одна строка до сборки, «Вернуть автопилот» её убирает", async () => {
+    await openFridge();
+    const sc = useStore.getState().project!.scenes[0];
+    act(() => useStore.setState({ project: { ...useStore.getState().project!, scenes: [{ ...sc, mix: { ...sc.mix, autopilot: false }, mix_check: { voice_over_bg_db: -1.7, master_gain_db: 19.3, warning: "autopilot" } }] } }));
+    renderRoute(<RenderScreen />);
+    const bar = await screen.findByTestId("mix-warn");
+    expect(bar).toHaveTextContent("Голос тише музыки — включи автопилот, он сам выровняет громкость.");
+    await userEvent.click(within(bar).getByRole("button", { name: "Вернуть автопилот" }));
+    await waitFor(() => expect(useStore.getState().project!.scenes[0].mix.autopilot).toBe(true));
+    await waitFor(() => expect(screen.queryByTestId("mix-warn")).toBeNull());
   });
   it("превью пересобирается само после правки (через ~1 с)", async () => {
     await openFridge();

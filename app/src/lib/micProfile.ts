@@ -4,6 +4,10 @@
  */
 import { peakDb, rmsDb, toDb } from "../audio/analyze";
 
+/** Система, на которой работает программа: для совета, где прибавить громкость микрофона. */
+const hostOs = (ua: string = typeof navigator === "undefined" ? "" : navigator.userAgent) =>
+  /Windows/i.test(ua) ? "Windows" : /Mac OS X|Macintosh/i.test(ua) ? "macOS" : "";
+
 /** Что сохраняем после проверки. Живёт на этом устройстве (ui.mic_profile) и, если движок умеет, в настройках. */
 export interface MicProfile {
   checked_at: string;
@@ -75,17 +79,29 @@ export function speechStats(samples: Float32Array, sampleRate: number, noiseDb: 
   return { peak, rms: n ? toDb(Math.sqrt(acc / n)) : -120, activeS: (active * win) / sampleRate };
 }
 
+/** Пик речи тише — «тихо». */
+export const QUIET_PEAK = -26;
+/** Средняя громкость речи тише — «микрофон тихий», даже если пики нормальные (как analysis.mic в движке). */
+export const QUIET_SPEECH_DB = -30;
+
 export function verdictOf(noiseDb: number, speechPeak: number, speechRms: number): MicVerdict {
   if (speechPeak < -50) return "silent";
   if (speechPeak > -3) return "loud";
-  if (speechPeak < -26) return "quiet";
+  // тихо и по пику, и по средней громкости речи: пик бывает нормальным (−15 дБ), а голос в целом тихий (−35 дБ)
+  if (speechPeak < QUIET_PEAK || speechRms < QUIET_SPEECH_DB) return "quiet";
   if (noiseDb > -45 || speechRms - noiseDb < 25) return "noisy";
   return "good";
 }
 
+/** Где прибавить громкость микрофона — по системе, на которой работает программа. */
+export function quietAdvice(os: string = hostOs()): string {
+  const where = os === "Windows" || os === "macOS" ? ` ${os}` : "";
+  return `Микрофон тихий: прибавь ему громкость в настройках звука${where} или подойди ближе к микрофону — на ширину ладони.`;
+}
+
 export const VERDICT_TEXT: Record<MicVerdict, { title: string; advice: string }> = {
   good: { title: "Микрофон в порядке", advice: "Уровень и тишина в комнате подходят. Можно записывать." },
-  quiet: { title: "Тихо", advice: "Придвинься ближе к микрофону (на ширину ладони) или добавь усиление в системных настройках звука." },
+  quiet: { title: "Тихо", advice: quietAdvice() },
   loud: { title: "Слишком громко", advice: "Звук рвётся на пиках. Отодвинься от микрофона или убавь усиление в системных настройках звука." },
   noisy: { title: "В комнате шумно", advice: "Фон слышен рядом с голосом. Закрой окно, выключи вентилятор и придвинься ближе к микрофону." },
   silent: { title: "Не слышу голос", advice: "Проверь, что выбран нужный микрофон и он не выключен. Потом повтори проверку." },

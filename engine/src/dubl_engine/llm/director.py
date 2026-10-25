@@ -161,18 +161,24 @@ def _normalize(target: str, field: str, value: Any, speaker_ids: set[str] | None
     return None
 
 
+#: правки громкости: после них автопилот выключается, иначе он затёр бы просьбу. Комнату, эффект голоса и «выкл.»
+#: автопилот и сам не трогает (audio.mix.automix) — с ними он остаётся включённым.
+LOUDNESS_FIELDS = frozenset({"gain_db", "target_lufs", "duck_background", "mode"})
+
+
 def apply_patches(mix: MixSettings, patches: list[MixPatch]) -> MixSettings:
     """Новые MixSettings с применёнными изменениями. Недопустимые патчи пропускаются.
 
-    Если что-то изменилось, autopilot выключается: иначе автосведение затёрло бы просьбу пользователя.
+    Если изменилась громкость (LOUDNESS_FIELDS), autopilot выключается: иначе автосведение затёрло бы просьбу
+    пользователя. Комната, эффект и «выкл.» автопилот не выключают — он их сохраняет.
     """
     out = mix.model_copy(deep=True)
-    changed = False
+    loud = False
     for p in patches:
         val = _normalize(p.target, p.field, p.value, None)
         if val is None:
             continue
-        changed = True
+        loud = loud or p.field in LOUDNESS_FIELDS
         if p.target == "master":
             if p.field == "duck_background":
                 out.duck_background = bool(val)
@@ -187,7 +193,7 @@ def apply_patches(mix: MixSettings, patches: list[MixPatch]) -> MixSettings:
             track = out.tracks.get(p.target) or TrackSettings()
             out.tracks[p.target] = track
         setattr(track, p.field, val)
-    if changed:
+    if loud:
         out.autopilot = False
     return out
 
@@ -201,7 +207,7 @@ CLIP_PEAK_DB = -1.0
 NO_MATCH_CONF = 0.0        # подгонка не нашла речь дубля — сдвиг 0 ничего не значит
 FIT_SURE = 0.4             # подгонка ниже этого не уверена — про губы молчим
 QUIET_PEAK_DB = -24.0
-QUIET_LUFS = -32.0
+QUIET_LUFS = -32.0         # речь дубля тише — «тихо записано», даже если пик нормальный (цель речи −20…−24 LUFS)
 TEXT_GOOD = 0.9
 TEXT_PARTIAL = 0.7
 
@@ -307,7 +313,7 @@ def take_report(take: Take, line: SceneLine) -> dict:
 _ADVICE: dict[str, str] = {
     "no_match": "Я не нашёл твой голос на месте этой реплики — проверь микрофон и запиши ещё раз, начиная вместе с видео.",
     "clipping": "Звук перегружен — отодвинься от микрофона или говори чуть спокойнее.",
-    "too_quiet": "Тебя еле слышно — подойди ближе к микрофону или говори увереннее.",
+    "too_quiet": "Тихо записано — поднеси микрофон ближе или прибавь громкость микрофона в системе.",
     "text_silent": "Я не разобрал слов в записи — проверь микрофон и запиши ещё раз.",
     "text_mismatch": "Текст заметно ушёл от сценария — перечитай реплику перед записью.",
     "text_partial": "Часть слов отличается от сценария — читай ближе к тексту.",

@@ -226,6 +226,7 @@ export class HttpEngine implements Engine {
   });
   clipUrl = (pid: string, scid: string) => this.file(pid, `scenes/${scid}/clip.mp4`);
   previewUrl = (pid: string, scid: string) => this.file(pid, `scenes/${scid}/preview.mp4`);
+  backgroundUrl = (pid: string, scid: string) => this.file(pid, `scenes/${scid}/background.wav`);
   takeUrl = (pid: string, scid: string, t: Take) => this.file(pid, `scenes/${scid}/${t.file}`);
   thumbnailUrl = (pid: string, rel: string | null | undefined) => (rel ? this.file(pid, rel) : null);
 }

@@ -283,6 +283,7 @@ def add_take(store: ProjectStore, pid: str, scid: str, wav_bytes: bytes, line_id
         with store.edit(pid) as p:
             sc = p.scenes[store.scene_index(p, scid)]
             sc.takes.append(take)
+            sc.mix_check = None              # новый дубль — прежняя проверка сведения уже не про то, что звучит
             apply_default_star(sc, line_id)
             take = next(t for t in sc.takes if t.id == take_id).model_copy(deep=True)
             if take.speaker_id and not take.empty and take.speaker_id not in sc.dubbed_speakers:
@@ -303,13 +304,14 @@ def delete_take(store: ProjectStore, pid: str, scid: str, tid: str) -> None:
             t.chosen_by_user = False
             apply_default_star(sc, t.line_id)
         sc.mix = drop_stale_tracks(sc)      # у «ещё не озвучен» не остаётся старого усиления (−7,8 дБ)
+        sc.mix_check = None
     delete_take_files(store, pid, scid, tid)
 
 
 def _render(store: ProjectStore, pid: str, scid: str, rs: RenderSettings, ctx, *, out: Path, subtitle_file: bool,
             target_lufs: float, keep_master: Path | None = None) -> Path:
     """Сведение → мастеринг → видео одной сцены. keep_master — куда сохранить мастер-WAV (для склейки сцен)."""
-    from ..audio.mix import automix, export_stems, mix_scene
+    from ..audio.mix import automix, export_stems, mix_check, mix_scene
     from ..audio.render import compute_geometry, master_for_aac, render_video, write_subtitles
 
     project = store.get(pid)
@@ -329,17 +331,26 @@ def _render(store: ProjectStore, pid: str, scid: str, rs: RenderSettings, ctx, *
                 with store.edit(pid) as p:
                     p.scenes[store.scene_index(p, scid)].mix = new_mix
                 scene = scene.model_copy(update={"mix": new_mix})
-            mixed = mix_scene(scene, stems, work / "mix.wav")
+            rep: dict = {}
+            mixed = mix_scene(scene, stems, work / "mix.wav", report=rep)
             if rs.export_stems:
                 export_stems(scene, stems, out.with_name(out.stem + "_stems"))
         with ctx.step("master"):
             from ..audio.master import resolve_target_lufs
             target_lufs = resolve_target_lufs(scene.mix.loudness_target, target_lufs, sd / "original.wav")
             mastered = work / "master.wav"
-            master_for_aac(mixed, mastered, target_lufs=target_lufs, true_peak_db=scene.mix.true_peak_db)
+            loud = master_for_aac(mixed, mastered, target_lufs=target_lufs, true_peak_db=scene.mix.true_peak_db)
             if keep_master is not None:
                 keep_master.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(mastered, keep_master)
+            # честная проверка: не тонет ли голос и не пришлось ли сильно поднимать ролик (UI покажет одну строку)
+            gain = None if rep.get("mix_lufs") is None else float(loud.lufs) - float(rep["mix_lufs"])
+            check = mix_check(scene.mix, rep.get("voice_over_bg_db"), gain)
+            try:
+                with store.edit(pid) as p:
+                    p.scenes[store.scene_index(p, scid)].mix_check = check
+            except EngineError:
+                pass                                 # сцену удалили, пока шла сборка
         with ctx.step("video"):
             sub_lines = subtitle_lines(project, scene)
             ass = None
