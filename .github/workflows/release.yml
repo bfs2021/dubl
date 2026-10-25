@@ -54,7 +54,9 @@ jobs:
     needs: plan
     runs-on: ${{ matrix.os }}
     env:
-      APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+      # Есть ли сертификат Apple. Сами APPLE_* в окружение сборки попадают только когда он есть:
+      # Tauri считает даже пустую APPLE_CERTIFICATE сертификатом и падает на импорте.
+      HAS_APPLE_CERT: ${{ secrets.APPLE_CERTIFICATE != '' }}
       # AppImage: linuxdeploy не должен трогать strip-ом файлы движка (PyInstaller-сборка со своими .so)
       NO_STRIP: "true"
       # тег v* — всегда релиз; ручной запуск — только если включено «release»
@@ -102,10 +104,14 @@ jobs:
 
       # ── macOS: подпись ресурсов движка (Tauri сам в resources не заходит) ──
       - name: macOS · ключ в связку ключей и подпись ресурсов
-        if: matrix.platform == 'macos' && env.APPLE_CERTIFICATE != ''
+        if: matrix.platform == 'macos' && env.HAS_APPLE_CERT == 'true'
         env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           echo "$APPLE_CERTIFICATE" | base64 --decode > "$RUNNER_TEMP/cert.p12"
           security create-keychain -p ci "$RUNNER_TEMP/build.keychain"
@@ -116,6 +122,10 @@ jobs:
           security list-keychains -d user -s "$RUNNER_TEMP/build.keychain" login.keychain
           rm "$RUNNER_TEMP/cert.p12"
           python packaging/sign_macos.py --identity "$APPLE_SIGNING_IDENTITY" --root app/src-tauri/resources
+          # подпись и нотаризация .app в tauri-action — только при наличии сертификата
+          for v in APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_SIGNING_IDENTITY APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID; do
+            if [ -n "${!v}" ]; then { echo "$v<<__DUBL_EOF__"; echo "${!v}"; echo "__DUBL_EOF__"; } >> "$GITHUB_ENV"; fi
+          done
 
       # Релиз (тег или «release»): tauri-action собирает и кладёт установщики в черновик релиза.
       - name: Сборка и публикация (tauri-action)
@@ -123,12 +133,6 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # macOS: подпись .app и нотаризация (если секретов нет — соберётся неподписанный dmg)
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           projectPath: app
           tagName: ${{ github.ref_type == 'tag' && github.ref_name || format('dev-{0}', github.run_number) }}
@@ -145,12 +149,6 @@ jobs:
       - name: Сборка (tauri-action, без релиза)
         if: env.PUBLISH != 'true'
         uses: tauri-apps/tauri-action@v0
-        env:
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           projectPath: app
           args: >-
