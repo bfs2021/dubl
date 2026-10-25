@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Вопрос или идея для обсуждения
+    url: https://github.com/pingvin1337/dubl/discussions
+    about: Как что-то сделать в программе, поделиться озвучкой, обсудить идею до того, как писать код.
   - name: Уязвимость
     url: https://github.com/pingvin1337/dubl/security/advisories/new
     about: О проблемах безопасности пиши здесь, а не в открытых обращениях.
