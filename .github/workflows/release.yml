@@ -127,6 +127,12 @@ jobs:
             if [ -n "${!v}" ]; then { echo "$v<<__DUBL_EOF__"; echo "${!v}"; echo "__DUBL_EOF__"; } >> "$GITHUB_ENV"; fi
           done
 
+      # Без сертификата: ad-hoc подпись ресурсов движка, а .app целиком подписывает Tauri (signingIdentity "-" в
+      # packaging/tauri-config/macos.json). Без этого скачанное приложение на Apple Silicon macOS называет «повреждённым».
+      - name: macOS · ad-hoc подпись ресурсов (нет сертификата)
+        if: matrix.platform == 'macos' && env.HAS_APPLE_CERT != 'true'
+        run: python packaging/sign_macos.py --identity - --root app/src-tauri/resources
+
       # Релиз (тег или «release»): tauri-action собирает и кладёт установщики в черновик релиза.
       - name: Сборка и публикация (tauri-action)
         if: env.PUBLISH == 'true'
