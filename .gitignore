@@ -19,3 +19,6 @@ app/src-tauri/binaries/
 Thumbs.db
 scores.md
 scores.json
+
+# мусор от `sed -i -e` на macOS
+*-e
